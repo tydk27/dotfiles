@@ -1,0 +1,17 @@
+[core]
+    editor = vim -c 'set fenc=utf8'
+    pager =
+    excludesfile = /home/hoge/.gitignore
+[user]
+    name = hoge
+    email = hoge@hoge
+[color]
+    ui = auto
+[alias]
+    co = checkout
+    cm = commit
+    st = status
+    br = branch -va
+    hist = log --pretty=format:\\\"%h %ad | %s%d [%an]\\\" --graph --date=short
+    fe = fetch --prune
+    pu = pull --prune

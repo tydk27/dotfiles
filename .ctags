@@ -1,0 +1,12 @@
+--recurse=yes
+--langmap=PHP:+.inc
+--php-kinds=cfd
+--languages=php
+--exclude=.git
+--exclude=node_modules
+--exclude=tests
+--exclude=temp
+--exclude=logs
+--exclude=vendor
+--exclude=libs
+--exclude=bin
