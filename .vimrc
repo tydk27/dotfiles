@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/01/20
+"   updated_at 2017/01/21
 "
 " You will need to have vim >= 7.4
 " (version 8.x is more better)
@@ -43,8 +43,8 @@ endif
 
 " dein {{{
 let s:dein_enabled = 0
-" 7.4未満は無視
-if v:version >= 704
+" 8以上のときだけプラギン適用
+if v:version >= 800
     let s:dein_enabled = 1
 
     if has('vim_starting')
@@ -211,8 +211,12 @@ endif
 syntax enable
 
 set t_Co=256
-" このカラースキーマ、中二っぽくてカッコE
-colorscheme badwolf
+if s:dein_enabled
+    " このカラースキーマ、中二っぽくてカッコE
+    colorscheme badwolf
+else
+    colorscheme desert
+endif
 
 set vb t_vb=
 set shortmess+=I                      " 起動時のメッセージを消す
