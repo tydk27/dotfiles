@@ -104,34 +104,15 @@ install_ctags() {
     make && make install && make clean
 }
 
-install_composer() {
-    cd "${work_dir}/"
-    echo 'install composer'
-    if [ ! -f ${work_dir}/composer-setup.php ]; then
-        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-        php -r "if (hash_file('SHA384', 'composer-setup.php') === 'e115a8dc7871f15d853148a7fbac7da27d6c0030b848d9b3dc09e2a0388afed865e6a3d6b3c0fad45c48e2b5fc1196ae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-        php composer-setup.php --install-dir=$install_dir --filename=composer
-    else
-        php composer.phar self-update
-    fi
-}
-
-install_php_cs_fixer() {
-    composer.phar require fabpot/php-cs-fixer
-}
-
 main() {
     make_install_dir
     make_work_dir
     set_env
     install_lua
     install_ncurses
-    install_ruby
     install_vim
     install_lynx
     install_ctags
-    install_composer
-    install_php_cs_fixer
 }
 
 main
