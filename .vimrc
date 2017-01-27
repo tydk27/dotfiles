@@ -440,8 +440,8 @@ if s:dein_enabled
     " }}}
 
     " Snippet {{{
-    inoremap <C-k> <Plug>(neosnippet_expand_or_jump)
-    snoremap <C-k> <Plug>(neosnippet_expand_or_jump)
+    imap <C-k> <Plug>(neosnippet_expand_or_jump)
+    smap <C-k> <Plug>(neosnippet_expand_or_jump)
     let g:neosnippet#enable_snipmate_compatibility = 1
     " クソ重いのでコメントアウト（標準のみ使う）
     " let g:neosnippet#snippets_directory='~/.vim/snippets/'
