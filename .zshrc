@@ -1,68 +1,112 @@
-HISTSIZE=200 HISTFILE=~/.zhistory SAVEHIST=180
-PROMPT='%B%F{green}%n@%M:%f%F{blue}%~%f `vcs_echo`%b
-%# '
-RPROMPT='%B%F{magenta}[%*]%f%b'
+typeset -U path
+setopt no_beep
+bindkey -e
 
-autoload -U compinit && compinit
-autoload -U colors && colors
-autoload -U vcs_info
+zstyle :compinstall filename '~/.zshrc'
+autoload -Uz compinit && compinit
 
+# モジュール読み込み
+zmodload zsh/datetime
+zmodload zsh/mathfunc
+#zmodload zsh/files
+zmodload zsh/stat
+zmodload zsh/system
+zmodload zsh/net/tcp
+zmodload zsh/zftp
+zmodload zsh/zprof
+zmodload zsh/zpty
+
+# 色々
+autoload -Uz colors && colors
 export LSCOLORS=gxfxcxdxbxegedabagacag
 export LS_COLORS='di=36;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;46'
+autoload -Uz vcs_info
+autoload -Uz is-at-least
 
-setopt auto_cd auto_remove_slash auto_name_dirs
-setopt extended_history hist_ignore_dups hist_ignore_space prompt_subst
-setopt extended_glob list_types no_beep always_last_prompt
-setopt cdable_vars sh_word_split auto_param_keys pushd_ignore_dups
-setopt print_eight_bit
-# setopt auto_menu  correct rm_star_silent sun_keyboard_hack
-# setopt share_history inc_append_history
+# ヒストリー
+setopt append_history extended_history hist_ignore_all_dups hist_ignore_space hist_no_store
+HISTFILE=~/.zhistory
+HISTSIZE=200
+SAVEHIST=180
 
-alias copy='cp -ip' del='rm -i' move='mv -i'
-alias fullreset='echo "\ec\ec"'
-h () {history $* | less}
-alias ja='LANG=ja_JP.eucJP XMODIFIERS=@im=kinput2'
-alias ls='ls -F' la='ls -a' ll='ls -la' lr='ls -ltr'
-mdcd () {mkdir -p "$@" && cd "$*[-1]"}
-mdpu () {mkdir -p "$@" && pushd "$*[-1]"}
-alias pu=pushd po=popd dirs='dirs -v'
-alias ssh='TERM=xterm ssh'
+# ディレクトリ関連
+setopt auto_cd auto_pushd pushd_ignore_dups auto_name_dirs
 
+# 補完
+# 補完オプション
+setopt always_last_prompt complete_in_word auto_list auto_menu
+setopt auto_param_keys auto_param_slash auto_remove_slash extended_glob
+setopt complete_aliases glob_complete hash_list_all list_ambiguous list_types rec_exact
+
+# 一覧表示グループ化
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%BCompleting %d%b'
+
+# vimとかで同じファイルを指定しないようにさせる
+zstyle ':completion:*:(vi|vim|cp|mv|rm|less):*' ignore-line true
+
+# configureのヘルプを良い感じに補完する
+function configure-help() {
+    grep -- '^[ \t]*--[A-Za-z]' ${~words[1]} | egrep -v '\[|\]'
+}
+zstyle ':completion:*:configure:*:options' command configure-help
+
+# コンプリータ
+zstyle ':completion:*' completer _complete _approximate _correct_filename _prefix _match _ignored
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# エイリアス
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
     alias dir='dir --color=auto'
-
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
+alias copy='cp -ip'
+alias del='rm -i'
+alias move='mv -i'
+alias la='ls -a'
+alias ll='ls -la'
+alias lr='ls -ltr'
+alias df='df -h'
+alias ps='ps --sort=start_time'
+alias ssh='TERM=xterm ssh'
 
-# Suffix Aliases
-# alias -s pdf=acroread dvi=xdvi
-# alias -s {odt,ods,odp,doc,xls,ppt}=soffice
-# alias -s {tgz,lzh,zip,arc}=file-roller
-
-# binding keys
-bindkey -e
-# bindkey '^p' history-beginning-search-backward
-# bindkey '^n' history-beginning-search-forward
-
-# completion
-zstyle ':completion:*' format '%BCompleting %d%b'
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-
-# display Git branch-name
-zstyle ':vcs_info:*' enable git svn
-zstyle ':vcs_info:*' max-exports 6
-zstyle ':vcs_info:git:*' check-for-changes true
+# Gitのブランチ名をプロンプトに表示させる
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git:*' max-exports 6
 zstyle ':vcs_info:git:*' formats '%b'
-zstyle ':vcs_info:git:*' actionformats '%b'
-vcs_echo() {
-    local color
+zstyle ':vcs_info:git:*' actionformats '%b|%a'
+if is-at-least 4.3.10; then
+    #zstyle ':vcs_info:git:*' check-for-changes true
+    #zstyle ':vcs_info:git:*' stagedstr '+'
+    #zstyle ':vcs_info:git:*' unstagedstr '?'
+    #zstyle ':vcs_info:git:*' formats '%b' '%c' '%u'
+    #zstyle ':vcs_info:git:*' actionformats '%b|%a' '%c' '%u'
+fi
+function echo_branch () {
+    local branch
     STY= LANG=en_US.UTF-8 vcs_info
-    color=${fg[red]}
-    echo -n "%{$color%}$(git name-rev --name-only HEAD 2> /dev/null)%{$reset_color%}"
+    if [[ -n "$vcs_info_msg_0_" ]]; then
+        branch="$vcs_info_msg_0_"
+        if [[ -n "$vcs_info_msg_1_" ]]; then
+            # staged
+            branch="%F{red}($branch)%f%F{green}[+]%f"
+        elif [[ -n "$vcs_info_msg_2_" ]]; then
+            # unstaged
+            branch="%F{red}($branch)%f%F{yellow}[?]%f"
+        else
+            branch="%F{red}($branch)%f"
+        fi
+        print -n "$branch"
+    fi
 }
+
+# プロンプト
+setopt prompt_subst
+PROMPT='%B%F{green}%n@%M:%f%F{blue}%~%f `echo_branch`%b
+%# '
+RPROMPT='%B%F{magenta}[%*]%f%b'
