@@ -1,20 +1,18 @@
-typeset -U path
-setopt no_beep
-bindkey -e
+typeset -U path             # PATHをユニークにする
+bindkey -e                  # emacsキーバインド
+setopt no_beep              # beep音なし
 
 zstyle :compinstall filename '~/.zshrc'
 autoload -Uz compinit && compinit
 
 # モジュール読み込み
-zmodload zsh/datetime
-zmodload zsh/mathfunc
-#zmodload zsh/files
-zmodload zsh/stat
-zmodload zsh/system
-zmodload zsh/net/tcp
-zmodload zsh/zftp
-zmodload zsh/zprof
-zmodload zsh/zpty
+zmodload zsh/datetime       # strftime関数やEPOCHSECONDS環境変数が使える
+zmodload zsh/mathfunc       # Cのような数式評価が使える
+zmodload zsh/example        # モジュール作成用サンプル
+zmodload zsh/files          # 一部の標準コマンドを独自用法で使う
+zmodload zsh/stat           # stat値を取得表示
+zmodload zsh/system         # syserror sysread syswrite
+zmodload zsh/zprof          # シェル関数プロファイリング
 
 # 色々
 autoload -Uz colors && colors
@@ -22,39 +20,6 @@ export LSCOLORS=gxfxcxdxbxegedabagacag
 export LS_COLORS='di=36;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;46'
 autoload -Uz vcs_info
 autoload -Uz is-at-least
-
-# ヒストリー
-setopt append_history extended_history hist_ignore_all_dups hist_ignore_space hist_no_store
-HISTFILE=~/.zhistory
-HISTSIZE=200
-SAVEHIST=180
-
-# ディレクトリ関連
-setopt auto_cd auto_pushd pushd_ignore_dups auto_name_dirs
-
-# 補完
-# 補完オプション
-setopt always_last_prompt complete_in_word auto_list auto_menu
-setopt auto_param_keys auto_param_slash auto_remove_slash extended_glob
-setopt complete_aliases glob_complete hash_list_all list_ambiguous list_types rec_exact
-
-# 一覧表示グループ化
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*:descriptions' format '%BCompleting %d%b'
-
-# vimとかで同じファイルを指定しないようにさせる
-zstyle ':completion:*:(vi|vim|cp|mv|rm|less):*' ignore-line true
-
-# configureのヘルプを良い感じに補完する
-function configure-help() {
-    grep -- '^[ \t]*--[A-Za-z]' ${~words[1]} | egrep -v '\[|\]'
-}
-zstyle ':completion:*:configure:*:options' command configure-help
-
-# コンプリータ
-zstyle ':completion:*' completer _complete _approximate _correct_filename _prefix _match _ignored
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # エイリアス
 if [ -x /usr/bin/dircolors ]; then
@@ -75,36 +40,69 @@ alias df='df -h'
 alias ps='ps --sort=start_time'
 alias ssh='TERM=xterm ssh'
 
+# ヒストリー
+setopt append_history       # ヒストリファイルに追記
+setopt extended_history     # ヒストリを拡張フォーマットで保存
+setopt hist_ignore_all_dups # 同一コマンドは保存しない
+setopt hist_ignore_space    # 先頭スペースのコマンドは保存しない
+setopt hist_no_store        # ヒストリ参照コマンドは保存しない
+HISTFILE=~/.zhistory
+HISTSIZE=200
+SAVEHIST=180
+
+# ディレクトリ関連
+setopt auto_cd              # cd省略
+setopt auto_pushd           # 元ディレクトリをスタックにプッシュ
+setopt pushd_ignore_dups    # 同じディレクトリはプッシュしない
+
+# 補完
+# 補完オプション
+setopt always_last_prompt   # プロンプトの再生成禁止
+setopt complete_in_word     # カーソル位置で補完可に
+setopt auto_list            # 自動で一覧表示
+setopt auto_menu            # 自動でメニュー補完
+setopt auto_param_keys      # 閉じ括弧でカンマなどを消す
+setopt auto_param_slash     # ディレクトリなら自動でスラッシュ付与
+setopt auto_remove_slash    # 自動スラッシュをデリミタ入力で削除
+setopt complete_aliases     # 補完時にエイリアスを置き換えない
+setopt extended_glob        # グロッビングフラグ
+setopt glob_complete        # グロッビング補完
+setopt hash_list_all        # コマンド補完でハッシュチェック
+setopt list_types           # 一覧のファイル末尾に種別表示
+setopt rec_exact            # 完全一致なら確定
+# 一覧表示グループ化とdesc表示フォーマット
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' format '%BCompleting %d%b'
+# vimはメニュー選択モード
+zstyle ':completion:*:vim:*' menu true select
+# pingのhostsを指定
+zstyle ':completion:*:ping:*' hosts www.google.com
+# vimとかで同じファイルを指定しないようにさせる
+zstyle ':completion:*:(vi|vim|cp|mv|rm|less):*' ignore-line true
+# _match:globパターンを含む補完選別
+zstyle ':completion:*' completer _complete _match _ignored
+# 小文字大文字どちらでも補完可
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z} m:{A-Z}={a-z}'
+# 候補一覧の色分けをLS_COLORSで表示する
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+
 # Gitのブランチ名をプロンプトに表示させる
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' max-exports 6
-zstyle ':vcs_info:git:*' formats '%b'
+zstyle ':vcs_info:git:*' formats "%F{red}(%b)%f"
 zstyle ':vcs_info:git:*' actionformats '%b|%a'
 if is-at-least 4.3.10; then
-    #zstyle ':vcs_info:git:*' check-for-changes true
-    #zstyle ':vcs_info:git:*' stagedstr '+'
-    #zstyle ':vcs_info:git:*' unstagedstr '?'
-    #zstyle ':vcs_info:git:*' formats '%b' '%c' '%u'
-    #zstyle ':vcs_info:git:*' actionformats '%b|%a' '%c' '%u'
+    zstyle ':vcs_info:git:*' check-for-changes true
+    zstyle ':vcs_info:git:*' formats "%F{red}(%b)%f%c%u"
+    zstyle ':vcs_info:git:*' stagedstr "%F{green}[+]%f"
+    zstyle ':vcs_info:git:*' unstagedstr "%F{yellow}[!]%f"
 fi
 function echo_branch () {
-    local branch
     STY= LANG=en_US.UTF-8 vcs_info
     if [[ -n "$vcs_info_msg_0_" ]]; then
-        branch="$vcs_info_msg_0_"
-        if [[ -n "$vcs_info_msg_1_" ]]; then
-            # staged
-            branch="%F{red}($branch)%f%F{green}[+]%f"
-        elif [[ -n "$vcs_info_msg_2_" ]]; then
-            # unstaged
-            branch="%F{red}($branch)%f%F{yellow}[?]%f"
-        else
-            branch="%F{red}($branch)%f"
-        fi
-        print -n "$branch"
+        print -n "$vcs_info_msg_0_"
     fi
 }
-
 # プロンプト
 setopt prompt_subst
 PROMPT='%B%F{green}%n@%M:%f%F{blue}%~%f `echo_branch`%b
