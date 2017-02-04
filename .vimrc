@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/01/21
+"   updated_at 2017/02/05
 "
 " You will need to have vim >= 7.4
 " (version 8.x is more better)
@@ -23,7 +23,7 @@
 " for japanese
 set encoding=utf-8
 scriptencoding utf-8
-set fileencodings=utf-8,sjis,euc-jp,latin1
+set fileencodings=iso-2022-jp,euc-jp,sjis,cp932,utf-8
 
 filetype off
 filetype plugin indent off
@@ -210,6 +210,13 @@ endif
 
 syntax enable
 
+" 全角スペースを強調表示する
+augroup highlightZenkaku
+    autocmd!
+    autocmd ColorScheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
+    autocmd VimEnter,WinEnter * match IdeographicSpace /　/
+augroup END
+
 set t_Co=256
 if s:dein_enabled
     " このカラースキーマ、中二っぽくてカッコE
@@ -300,7 +307,7 @@ endif
 if s:dein_enabled
     " path {{{
     " サードパーティのパスなど
-    let s:pcf_path       = $HOME . '/.composer/vendor/fabpot/php-cs-fixer/php-cs-fixer'
+    let s:pcf_path       = $HOME . '/.composer/vendor/bin/php-cs-fixer'
 
     let s:php_dict_path  = $HOME . '/.vim/dict/php.dict'
     let s:lynx_path      = $HOME . '/local/bin/lynx'
@@ -615,7 +622,6 @@ augroup indentgroup
     autocmd FileType css        setlocal tabstop=2 softtabstop=2 shiftwidth=2
 augroup END
 
-
 " 自動で閉じ括弧付けるのはウザいのでエンターで閉じさせる
 inoremap {<Enter> {}<LEFT>
 inoremap [<Enter> []<LEFT>
@@ -642,19 +648,6 @@ vnoremap <Tab> %
 nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
 nnoremap <silent> <C-c><C-c> :nohlsearch<CR>
 
-" 気持ちの悪い全角スペースを強調表示する
-function! ZenkakuSpace()
-    highlight ZenkakuSpace cterm=underline ctermfg=lightblue guibg=yellow
-endfunction
-if has('syntax')
-    augroup ZenkakuSpace
-        autocmd!
-        autocmd ColorScheme * call ZenkakuSpace()
-        autocmd VimEnter,WinEnter,BufRead * let w:m1=matchadd('ZenkakuSpace', '　')
-    augroup END
-    call ZenkakuSpace()
-endif
-
 " 保存時に各行末の空白を除去
 function! s:remove_dust()
     let cursor = getpos('.')
@@ -663,5 +656,11 @@ function! s:remove_dust()
     unlet cursor
 endfunction
 autocmd BufWritePre * call <SID>remove_dust()
+
+" vimgrepの結果は常にQuickFixで開く
+augroup grepopen
+    autocmd!
+    autocmd QuickfixCmdPost vimgrep cw
+augroup END
 
 filetype plugin indent on
