@@ -20,6 +20,7 @@
 "   * php-cs-fixer
 "   * GNU Global
 "   * clang
+"   * The Silver Searcher
 "
 
 " for japanese
@@ -88,7 +89,7 @@ if v:version >= 800
 
         call dein#add('tpope/vim-fugitive')
         call dein#add('ctrlpvim/ctrlp.vim')
-        " call dein#add('rking/ag.vim')
+        call dein#add('rking/ag.vim')
         " call dein#add('osyo-manga/vim-anzu')
 
         call dein#add('junegunn/vim-easy-align')
@@ -548,18 +549,35 @@ if s:dein_enabled
     " Unite {{{
     let g:unite_enable_start_insert = 1
     let g:unite_enable_split_vertically = 0
+    let g:unite_enable_ignore_case = 1
+    let g:unite_enable_smart_case = 1
     let g:unite_winheight = 15
     let g:unite_winwidth = 40
+
     noremap <C-B> :Unite buffer<CR>
     noremap <C-N> :Unite -buffer-name=file file<CR>
     noremap <C-Z> :Unite file_mru<CR>
     noremap :uff :<C-u>UniteWithBufferDir file -buffer-name=file<CR>
+
     au FileType unite nnoremap <silent> <buffer> <expr> <C-J> unite#do_action('split')
     au FileType unite inoremap <silent> <buffer> <expr> <C-J> unite#do_action('split')
     au FileType unite nnoremap <silent> <buffer> <expr> <C-K> unite#do_action('vsplit')
     au FileType unite inoremap <silent> <buffer> <expr> <C-K> unite#do_action('vsplit')
     au FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
     au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
+
+    nnoremap <silent> ,g  :<C-u>Unite grep:. -buffer-name=search-buffer<CR>
+    nnoremap <silent> ,cg :<C-u>Unite grep:. -buffer-name=search-buffer<CR><C-R><C-W>
+    " }}}
+
+    " using ag {{{
+    if executable('ag')
+        let g:unite_source_grep_command = 'ag'
+        let g:unite_source_grep_default_opts = '--nogroup --nocolor --column'
+        let g:unite_source_grep_recursive_opt = ''
+
+        let g:ctrlp_user_command = 'ag %s -l'
+    endif
     " }}}
 
     " NERDTreeToggle {{{
@@ -600,13 +618,6 @@ if s:dein_enabled
     nnoremap <Leader>rw :<C-u>Ref webdict wiki<Space>
 
     autocmd FileType ref-* nnoremap <buffer> <silent> q :<C-u>close<CR>
-    " }}}
-
-    " search without cache {{{
-    " if executable('ag')
-    "     let g:ctrlp_use_caching = 0
-    "     let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup -g ""'
-    " endif
     " }}}
 
     " VimShell {{{
