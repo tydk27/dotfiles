@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/01/21
+"   updated_at 2017/03/08
 "
 " You will need to have vim >= 7.4
 " (version 8.x is more better)
@@ -14,10 +14,12 @@
 "   --with-tlib=ncurses
 "   --prefix=$HOME./local
 "
-" extra applications
+" extra tool
 "   * ctags
 "   * lynx
 "   * php-cs-fixer
+"   * GNU Global
+"   * clang
 "
 
 " for japanese
@@ -150,9 +152,10 @@ if v:version >= 800
         " }}}
 
         " C++ {{{
+        call dein#add('justmao945/vim-clang')
         call dein#add('vim-jp/cpp-vim')
-        call dein#add('osyo-manga/vim-marching')
-        call dein#add('rhysd/vim-clang-format')
+        " call dein#add('osyo-manga/vim-marching')
+        " call dein#add('rhysd/vim-clang-format')
         " }}}
 
         " Go lang {{{
@@ -173,8 +176,9 @@ if v:version >= 800
 
         " extra tool {{{
         call dein#add('sudo.vim')
-        call dein#add('thinca/vim-scouter')
+        " call dein#add('thinca/vim-scouter')
         call dein#add('soramugi/auto-ctags.vim')
+        " call dein#add('vim-scripts/gtags.vim')
         call dein#add('majutsushi/tagbar')
 
         " call dein#add('itchyny/vim-parenmatch')
@@ -217,6 +221,9 @@ if s:dein_enabled
 else
     colorscheme desert
 endif
+
+" includeに飛ぶ
+set path=.,$HOME/local/include,/usr/include
 
 set vb t_vb=
 set shortmess+=I                      " 起動時のメッセージを消す
@@ -417,6 +424,16 @@ if s:dein_enabled
     endif
     let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 
+    " for vim-clang {{{
+    if !exists('g:neocomplete#force_omni_input_patterns')
+        let g:neocomplete#force_omni_input_patterns = {}
+    endif
+    let g:neocomplete#force_omni_input_patterns.c =
+                \ '[^.[:digit:] *\t]\%(\.\|->\)\w*'
+    let g:neocomplete#force_omni_input_patterns.cpp =
+                \ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
+    " }}}
+
     inoremap <expr><C-g> neocomplete#undo_completion()
     inoremap <expr><C-l> neocomplete#complete_common_string()
 
@@ -432,11 +449,10 @@ if s:dein_enabled
     inoremap <expr><C-y> neocomplete#close_popup()
     inoremap <expr><C-e> neocomplete#cancel_popup()
 
-    autocmd FileType css           setlocal omnifunc=csscomplete#CompleteCSS
-    autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-    autocmd FileType javascript    setlocal omnifunc=javascriptcomplete#CompleteJS
-    autocmd FileType python        setlocal omnifunc=pythoncomplete#Complete
-    autocmd FileType xml           setlocal omnifunc=xmlcomplete#CompleteTags
+    autocmd FileType html,markdown,tpl setlocal omnifunc=htmlcomplete#CompleteTags
+    autocmd FileType css               setlocal omnifunc=csscomplete#CompleteCSS
+    autocmd FileType javascript        setlocal omnifunc=javascriptcomplete#CompleteJS
+    autocmd filetype xml               setlocal omnifunc=xmlcomplete#completetags
     " }}}
 
     " Snippet {{{
@@ -449,6 +465,22 @@ if s:dein_enabled
     if has('conceal')
         set conceallevel=2 concealcursor=i
     endif
+    " }}}
+
+    " vim-clang {{{
+    let g:clang_auto = 0
+
+    let g:clang_c_completeopt = 'menuone,preview'
+    let g:clang_cpp_completeopt = 'menuone,preview'
+
+    " let g:clang_format_auto = 1
+    " let g:clang_check_syntax_auto = 0
+
+    let g:clang_c_options = '-std=c11'
+    let g:clang_cpp_options = '-std=c++1z -stdlib=libc++ --pedantic-errors'
+    let g:clang_format_style = 'Google'
+
+    autocmd BufWrite,FileWritePre,FileAppendPre *.[ch]pp call ClangFormat()
     " }}}
 
     " quickrun {{{
@@ -523,6 +555,7 @@ if s:dein_enabled
     au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
     " }}}
 
+    " NERDTreeToggle {{{
     nnoremap <silent><C-e> :NERDTreeToggle<CR>
     " }}}
 
@@ -575,8 +608,15 @@ if s:dein_enabled
 
     " ctags {{{
     let g:auto_ctags = 1
+    let g:auto_ctags_tags_args = '--append=yes --recurse=yes --sort=yes --languages=PHP,C,C++'
     nnoremap <F3> :<C-u>tab stj <C-R>=expand('<cword>')<CR><CR>
+
     nnoremap <F8> :TagbarToggle<CR>
+    " }}}
+
+    " gtags {{{
+    nnoremap <C-f> :Gtags -f %<CR>
+    nnoremap <C-j> :GtagsCursor<CR>
     " }}}
 
     " インデント可視化 {{{

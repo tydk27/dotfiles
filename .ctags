@@ -1,8 +1,12 @@
+--append=yes
 --recurse=yes
---langmap=PHP:+.inc
---php-kinds=cfd
---languages=php
+--sort=yes
+--languages=PHP,C,C++
+--c-kinds=cdfgmsu
+--c++-kinds=cdfgmsu
+--php-kinds=cdf
 --exclude=.git
+--exclude=.svn
 --exclude=node_modules
 --exclude=tests
 --exclude=temp
