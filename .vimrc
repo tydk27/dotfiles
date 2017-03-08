@@ -25,7 +25,7 @@
 " for japanese
 set encoding=utf-8
 scriptencoding utf-8
-set fileencodings=iso-2022-jp,euc-jp,sjis,cp932,utf-8
+set fileencodings=utf-8,iso-2022-jp,euc-jp,sjis,cp932
 
 filetype off
 filetype plugin indent off
