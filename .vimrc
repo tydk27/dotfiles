@@ -1,9 +1,8 @@
 "
 " My vimrc
-"   updated_at 2017/03/08
+"   updated_at 2017/03/16
 "
-" You will need to have vim >= 7.4
-" (version 8.x is more better)
+" You will need to have vim >= 8.0
 "
 " compile option
 "   --with-local-dir=$HOME./local
@@ -76,9 +75,12 @@ if v:version >= 800
         call dein#add('Shougo/vimshell')
         call dein#add('Shougo/vimfiler')
 
-        call dein#add('Shougo/neocomplete.vim')
-        call dein#add('Shougo/neosnippet')
-        call dein#add('Shougo/neosnippet-snippets')
+        " luaがなければ補完とスニペットは無効にする
+        if has('lua')
+            call dein#add('Shougo/neocomplete.vim')
+            call dein#add('Shougo/neosnippet')
+            call dein#add('Shougo/neosnippet-snippets')
+        endif
 
         call dein#add('thinca/vim-quickrun')
 
@@ -189,21 +191,6 @@ if v:version >= 800
         " call dein#add('Yggdroot/indentLine')
         " }}}
 
-        " Twitter with Vim {{{
-        " call dein#add('basyura/TweetVim')
-        " call dein#add('twitvim/twitvim')
-        " call dein#add('tyru/open-browser.vim')
-        " call dein#add('basyura/twibill.vim')
-        " call dein#add('mattn/webapi-vim')
-        " call dein#add('h1mesuke/unite-outline')
-        " call dein#add('basyura/bitly.vim')
-        " call dein#add('mattn/favstar-vim')
-        " }}}
-
-        " English {{{
-        " call dein#add('ujihisa/neco-look')
-        " }}}
-
         call dein#end()
         call dein#save_state()
     endif
@@ -277,6 +264,10 @@ if has('gui')
 endif
 set cursorline                        " カーソルラインをハイライト
 hi clear CursorLine                   " 行番号だけをハイライトする
+if has('conceal')
+    set conceallevel=0
+    set concealcursor=
+endif
 
 highlight Normal ctermbg    = none
 highlight Comment ctermfg   = 7
@@ -409,71 +400,69 @@ if s:dein_enabled
     " augroup END
     " }}}
 
-    " NeoComplete {{{
-    let g:neocomplete#enable_at_startup = 1
-    let g:neocomplete#enable_smart_case = 1
-    let g:neocomplete#enable_underbar_completion = 0
-    let g:neocomplete#enable_camel_case_completion  = 0
-    let g:neocomplete#max_list = 20
-    let g:neocomplete#sources#syntax#min_keyword_length = 3
-    let g:neocomplete#auto_completion_start_length = 2
-    let g:neocomplete#enable_auto_close_preview = 0
-    " let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+    if has('lua')
+        " NeoComplete {{{
+        let g:neocomplete#enable_at_startup = 1
+        let g:neocomplete#enable_smart_case = 1
+        let g:neocomplete#enable_underbar_completion = 0
+        let g:neocomplete#enable_camel_case_completion  = 0
+        let g:neocomplete#max_list = 20
+        let g:neocomplete#sources#syntax#min_keyword_length = 3
+        let g:neocomplete#auto_completion_start_length = 2
+        let g:neocomplete#enable_auto_close_preview = 0
+        " let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 
-    let g:neocomplete#sources#dictionary#dictionaries = {
-                \ 'default'  : '',
-                \ 'vimshell' : $HOME . '/.vimshell_hist',
-                \ 'scheme'   : $HOME . '/.gosh_completions',
-                \ 'php'      : s:php_dict_path
-                \ }
+        let g:neocomplete#sources#dictionary#dictionaries = {
+                    \ 'default'  : '',
+                    \ 'vimshell' : $HOME . '/.vimshell_hist',
+                    \ 'scheme'   : $HOME . '/.gosh_completions',
+                    \ 'php'      : s:php_dict_path
+                    \ }
 
-    if !exists('g:neocomplete#keyword_patterns')
-        let g:neocomplete#keyword_patterns = {}
+        if !exists('g:neocomplete#keyword_patterns')
+            let g:neocomplete#keyword_patterns = {}
+        endif
+        let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+
+        " for vim-clang {{{
+        if !exists('g:neocomplete#force_omni_input_patterns')
+            let g:neocomplete#force_omni_input_patterns = {}
+        endif
+        let g:neocomplete#force_omni_input_patterns.c =
+                    \ '[^.[:digit:] *\t]\%(\.\|->\)\w*'
+        let g:neocomplete#force_omni_input_patterns.cpp =
+                    \ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
+        " }}}
+
+        inoremap <expr><C-g> neocomplete#undo_completion()
+        inoremap <expr><C-l> neocomplete#complete_common_string()
+
+        inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+        function! s:my_cr_function()
+            return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
+        endfunction
+
+        inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+
+        inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+        inoremap <expr><BS>  neocomplete#smart_close_popup()."\<C-h>"
+        inoremap <expr><C-y> neocomplete#close_popup()
+        inoremap <expr><C-e> neocomplete#cancel_popup()
+
+        autocmd FileType html,markdown,tpl setlocal omnifunc=htmlcomplete#CompleteTags
+        autocmd FileType css               setlocal omnifunc=csscomplete#CompleteCSS
+        autocmd FileType javascript        setlocal omnifunc=javascriptcomplete#CompleteJS
+        autocmd filetype xml               setlocal omnifunc=xmlcomplete#completetags
+        " }}}
+
+        " Snippet {{{
+        imap <C-k> <Plug>(neosnippet_expand_or_jump)
+        smap <C-k> <Plug>(neosnippet_expand_or_jump)
+        let g:neosnippet#enable_snipmate_compatibility = 1
+        " クソ重いのでコメントアウト（標準のみ使う）
+        " let g:neosnippet#snippets_directory='~/.vim/snippets/'
+        " }}}
     endif
-    let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-    " for vim-clang {{{
-    if !exists('g:neocomplete#force_omni_input_patterns')
-        let g:neocomplete#force_omni_input_patterns = {}
-    endif
-    let g:neocomplete#force_omni_input_patterns.c =
-                \ '[^.[:digit:] *\t]\%(\.\|->\)\w*'
-    let g:neocomplete#force_omni_input_patterns.cpp =
-                \ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
-    " }}}
-
-    inoremap <expr><C-g> neocomplete#undo_completion()
-    inoremap <expr><C-l> neocomplete#complete_common_string()
-
-    inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-    function! s:my_cr_function()
-        return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-    endfunction
-
-    inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-
-    inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-    inoremap <expr><BS>  neocomplete#smart_close_popup()."\<C-h>"
-    inoremap <expr><C-y> neocomplete#close_popup()
-    inoremap <expr><C-e> neocomplete#cancel_popup()
-
-    autocmd FileType html,markdown,tpl setlocal omnifunc=htmlcomplete#CompleteTags
-    autocmd FileType css               setlocal omnifunc=csscomplete#CompleteCSS
-    autocmd FileType javascript        setlocal omnifunc=javascriptcomplete#CompleteJS
-    autocmd filetype xml               setlocal omnifunc=xmlcomplete#completetags
-    " }}}
-
-    " Snippet {{{
-    imap <C-k> <Plug>(neosnippet_expand_or_jump)
-    smap <C-k> <Plug>(neosnippet_expand_or_jump)
-    let g:neosnippet#enable_snipmate_compatibility = 1
-    " クソ重いのでコメントアウト（標準のみ使う）
-    " let g:neosnippet#snippets_directory='~/.vim/snippets/'
-
-    if has('conceal')
-        set conceallevel=2 concealcursor=i
-    endif
-    " }}}
 
     " vim-clang {{{
     let g:clang_auto = 0
@@ -656,6 +645,8 @@ if s:dein_enabled
     " let $RUST_SRC_PATH = s:rust_src_path
     " }}}
 
+    " vim-jsonでシンタックス上書き(jsonのダブルクオーテーション表示)
+    let g:vim_json_syntax_conceal = 0
 endif
 " }}} プラギン設定ここまで
 
