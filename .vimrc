@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/03/16
+"   updated_at 2017/03/17
 "
 " You will need to have vim >= 8.0
 "
@@ -614,7 +614,7 @@ if s:dein_enabled
     " }}}
 
     " ctags {{{
-    let g:auto_ctags = 1
+    let g:auto_ctags = 0
     let g:auto_ctags_tags_args = '--append=yes --recurse=yes --sort=yes --languages=PHP,C,C++'
     nnoremap <F3> :<C-u>tab stj <C-R>=expand('<cword>')<CR><CR>
 
