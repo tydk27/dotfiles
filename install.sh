@@ -42,6 +42,12 @@ install_ncurses() {
     if [ ! -f "${work_dir}/ncurses-6.0.tar.gz" ]; then
         wget http://ftp.yz.yamagata-u.ac.jp/pub/GNU/ncurses/ncurses-6.0.tar.gz
         tar -zxvf ncurses-6.0.tar.gz
+
+        # for gcc5 bug(Ubuntu16.04)
+        git clone https://github.com/tydk27/patch.git
+        cp "${work_dir}/patch/ncurses-6.0-gcc5.patch" "${work_dir}/ncurses-6.0/ncurses/base/"
+        cd "${work_dir}/ncurses-6.0/ncurses/base"
+        patch < ncurses-6.0-gcc5.patch
     fi
     cd "${work_dir}/ncurses-6.0"
     ./configure --prefix=$install_dir --without-cxx-bindings --with-shared
