@@ -1,3 +1,24 @@
+# zplug
+if [ -d ~/.zplug ]; then
+    source ~/.zplug/init.zsh
+
+    zplug 'yous/vanilli.sh'                            # バニラ
+    zplug 'zsh-users/zsh-autosuggestions'              # 補完強化
+    zplug 'zsh-users/zsh-completions'                  # 補完強化
+    zplug 'mollifier/cd-gitroot'                       # git便利
+    zplug 'zsh-users/zsh-syntax-highlighting', defer:2 # シンタックスハイライト
+    # zplug 'dracula/zsh', as:theme
+
+    if ! zplug check --verbose; then
+        printf 'Install? [y/N]: '
+        if read -q; then
+            echo; zplug install
+        fi
+    fi
+
+    zplug load --verbose
+fi
+
 typeset -U path             # PATHをユニークにする
 bindkey -e                  # emacsキーバインド
 setopt no_beep              # beep音なし
