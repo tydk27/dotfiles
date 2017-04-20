@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/03/17
+"   updated_at 2017/04/20
 "
 " You will need to have vim >= 8.0
 "
@@ -110,6 +110,7 @@ if v:version >= 800
 
         " ColorScheme {{{
         call dein#add('sjl/badwolf')
+        call dein#add('dracula/vim')
         call dein#add('tomasr/molokai')
         call dein#add('vim-scripts/Diablo3.git')
         call dein#add('vim-scripts/Lucius')
@@ -211,8 +212,10 @@ augroup END
 
 set t_Co=256
 if s:dein_enabled
-    " このカラースキーマ、中二っぽくてカッコE
-    colorscheme badwolf
+    " 中二っぽくてカッコE
+    " colorscheme badwolf
+    " どらきゅらもカッコE
+    colorscheme dracula
 else
     colorscheme desert
 endif
