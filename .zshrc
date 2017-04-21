@@ -2,45 +2,68 @@
 if [ -d ~/.zplug ]; then
     source ~/.zplug/init.zsh
 
-    zplug 'yous/vanilli.sh'                            # バニラ
-    zplug 'zsh-users/zsh-autosuggestions'              # 補完強化
+    zplug 'yous/vanilli.sh'                            # バニラなzsh
+    zplug 'zsh-users/zsh-autosuggestions'              # 候補デフォルト表示
     zplug 'zsh-users/zsh-completions'                  # 補完強化
-    zplug 'mollifier/cd-gitroot'                       # git便利
-    zplug 'zsh-users/zsh-syntax-highlighting', defer:2 # シンタックスハイライト
+    zplug 'zsh-users/zsh-syntax-highlighting', defer:2 # zshシンタックスハイライト
+    zplug 'mollifier/anyframe'                         # pecopecoharapeko
+    zplug 'mollifier/cd-gitroot'                       # gitのルートディレクトリに移動
     # zplug 'dracula/zsh', as:theme
 
-    if ! zplug check --verbose; then
-        printf 'Install? [y/N]: '
-        if read -q; then
-            echo; zplug install
-        fi
-    fi
+    # if ! zplug check --verbose; then
+    #     printf 'Install? [y/N]: '
+    #     if read -q; then
+    #         echo; zplug install
+    #     fi
+    # fi
+    zplug check || zplug install
 
-    zplug load --verbose
+    # zplug load --verbose
+    zplug load
 fi
 
-typeset -U path             # PATHをユニークにする
-bindkey -e                  # emacsキーバインド
-setopt no_beep              # beep音なし
-
 zstyle :compinstall filename '~/.zshrc'
+
 autoload -Uz compinit && compinit
+autoload -Uz colors && colors
+autoload -Uz vcs_info chpwd_recent_dirs cdr add-zsh-hook is-at-least
+if is-at-least 4.3.10; then
+    add-zsh-hook chpwd chpwd_recent_dirs
+fi
+
+# 色々
+export LSCOLORS=gxfxcxdxbxegedabagacag
+export LS_COLORS='di=36;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;46'
+
+# Gitのブランチ名をプロンプトに表示させる
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git:*' max-exports 6
+zstyle ':vcs_info:git:*' formats "%F{red}(%b)%f"
+zstyle ':vcs_info:git:*' actionformats '%b|%a'
+if is-at-least 4.3.10; then
+    zstyle ':vcs_info:git:*' check-for-changes true
+    zstyle ':vcs_info:git:*' formats "%F{red}(%b)%f%c%u"
+    zstyle ':vcs_info:git:*' stagedstr "%F{green}[+]%f"
+    zstyle ':vcs_info:git:*' unstagedstr "%F{yellow}[!]%f"
+fi
+function echo_branch () {
+    STY= LANG=en_US.UTF-8 vcs_info
+    if [[ -n "$vcs_info_msg_0_" ]]; then
+        print -n "$vcs_info_msg_0_"
+    fi
+}
+PROMPT='%B%F{green}%n@%M:%f%F{blue}%~%f `echo_branch`%b
+%# '
+RPROMPT='%B%F{magenta}[%*]%f%b'
 
 # モジュール読み込み
 zmodload zsh/datetime       # strftime関数やEPOCHSECONDS環境変数が使える
 zmodload zsh/mathfunc       # Cのような数式評価が使える
-zmodload zsh/example        # モジュール作成用サンプル
+# zmodload zsh/example      # モジュール作成用サンプル
 zmodload zsh/files          # 一部の標準コマンドを独自用法で使う
 zmodload zsh/stat           # stat値を取得表示
 zmodload zsh/system         # syserror sysread syswrite
 zmodload zsh/zprof          # シェル関数プロファイリング
-
-# 色々
-autoload -Uz colors && colors
-export LSCOLORS=gxfxcxdxbxegedabagacag
-export LS_COLORS='di=36;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;46'
-autoload -Uz vcs_info
-autoload -Uz is-at-least
 
 # エイリアス
 if [ -x /usr/bin/dircolors ]; then
@@ -60,16 +83,23 @@ alias lr='ls -ltr'
 alias df='df -h'
 alias ps='ps --sort=start_time'
 alias ssh='TERM=xterm ssh'
+alias cdg='cd-gitroot'
+
+# その他オプション
+typeset -U path             # PATHをユニークにする
+bindkey -e                  # emacsキーバインド
+setopt no_beep              # beep音なし
+setopt prompt_subst         # プロンプト
 
 # ヒストリー
+HISTFILE=~/.zhistory
+HISTSIZE=200
+SAVEHIST=180
 setopt append_history       # ヒストリファイルに追記
 setopt extended_history     # ヒストリを拡張フォーマットで保存
 setopt hist_ignore_all_dups # 同一コマンドは保存しない
 setopt hist_ignore_space    # 先頭スペースのコマンドは保存しない
 setopt hist_no_store        # ヒストリ参照コマンドは保存しない
-HISTFILE=~/.zhistory
-HISTSIZE=200
-SAVEHIST=180
 
 # ディレクトリ関連
 setopt auto_cd              # cd省略
@@ -91,6 +121,7 @@ setopt glob_complete        # グロッビング補完
 setopt hash_list_all        # コマンド補完でハッシュチェック
 setopt list_types           # 一覧のファイル末尾に種別表示
 setopt rec_exact            # 完全一致なら確定
+
 # 一覧表示グループ化とdesc表示フォーマット
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' format '%BCompleting %d%b'
@@ -107,25 +138,10 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z} m:{A-Z}={a-z}'
 # 候補一覧の色分けをLS_COLORSで表示する
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
-# Gitのブランチ名をプロンプトに表示させる
-zstyle ':vcs_info:*' enable git
-zstyle ':vcs_info:git:*' max-exports 6
-zstyle ':vcs_info:git:*' formats "%F{red}(%b)%f"
-zstyle ':vcs_info:git:*' actionformats '%b|%a'
-if is-at-least 4.3.10; then
-    zstyle ':vcs_info:git:*' check-for-changes true
-    zstyle ':vcs_info:git:*' formats "%F{red}(%b)%f%c%u"
-    zstyle ':vcs_info:git:*' stagedstr "%F{green}[+]%f"
-    zstyle ':vcs_info:git:*' unstagedstr "%F{yellow}[!]%f"
-fi
-function echo_branch () {
-    STY= LANG=en_US.UTF-8 vcs_info
-    if [[ -n "$vcs_info_msg_0_" ]]; then
-        print -n "$vcs_info_msg_0_"
-    fi
-}
-# プロンプト
-setopt prompt_subst
-PROMPT='%B%F{green}%n@%M:%f%F{blue}%~%f `echo_branch`%b
-%# '
-RPROMPT='%B%F{magenta}[%*]%f%b'
+# anyframeバインドキー
+bindkey '^xe' anyframe-widget-execute-history
+bindkey '^xp' anyframe-widget-put-history
+bindkey '^xi' anyframe-widget-insert-git-branch
+bindkey '^xc' anyframe-widget-checkout-git-branch
+bindkey '^xb' anyframe-widget-cdr
+bindkey '^xf' anyframe-widget-insert-filename
