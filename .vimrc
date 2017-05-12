@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/04/27
+"   updated_at 2017/05/12
 "
 " You will need to have vim >= 8.0
 "
@@ -113,14 +113,8 @@ if v:version >= 800
         " ColorScheme {{{
         call dein#add('sjl/badwolf')
         call dein#add('dracula/vim')
-        call dein#add('tomasr/molokai')
-        call dein#add('vim-scripts/Diablo3.git')
-        call dein#add('vim-scripts/Lucius')
-        call dein#add('vim-scripts/mrkn256.vim')
-        call dein#add('vim-scripts/twilight')
-        call dein#add('altercation/vim-colors-solarized')
-        call dein#add('nanotech/jellybeans.vim')
-        call dein#add('croaker/mustang-vim')
+        " call dein#add('tomasr/molokai')
+        call dein#add('AlessandroYorba/Alduin')
         " }}}
 
         " vim-line {{{
@@ -214,10 +208,10 @@ augroup END
 
 set t_Co=256
 if s:dein_enabled
-    " 中二っぽくてカッコE
     " colorscheme badwolf
-    " どらきゅらもカッコE
-    colorscheme dracula
+    " colorscheme dracula
+    let g:alduin_Shout_Dragon_Aspect = 1
+    colorscheme alduin
 else
     colorscheme desert
 endif
