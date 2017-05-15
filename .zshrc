@@ -52,9 +52,19 @@ function echo_branch () {
         print -n "$vcs_info_msg_0_"
     fi
 }
-PROMPT='%B%F{green}%n@%M:%f%F{blue}%~%f `echo_branch`%b
+
+# PROMPT='%B%F{green}%n@%M:%f%F{blue}%~%f `echo_branch`%b
+# %# '
+# RPROMPT='%B%F{magenta}[%*]%f%b'
+
+# 上記の設定だと目が痛くなるのでちょっと暗めにする
+P_NAME="%{[38;5;028m%}"
+P_PATH="%{[38;5;068m%}"
+P_DATE="%{[38;5;127m%}"
+COLOR_END="%{[0m%}"
+PROMPT='%B${P_NAME}%n@%M:${COLOR_END}${P_PATH}%~${COLOR_END} `echo_branch`%b
 %# '
-RPROMPT='%B%F{magenta}[%*]%f%b'
+RPROMPT='%B${P_DATE}[%*]${COLOR_END}%b'
 
 # モジュール読み込み
 zmodload zsh/datetime       # strftime関数やEPOCHSECONDS環境変数が使える
