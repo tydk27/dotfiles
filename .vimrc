@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/05/12
+"   updated_at 2017/06/04
 "
 " You will need to have vim >= 8.0
 "
@@ -175,7 +175,7 @@ if v:version >= 800
         " }}}
 
         " extra tool {{{
-        call dein#add('sudo.vim')
+        call dein#add('vim-scripts/sudo.vim')
         " call dein#add('thinca/vim-scouter')
         call dein#add('soramugi/auto-ctags.vim')
         " call dein#add('vim-scripts/gtags.vim')
