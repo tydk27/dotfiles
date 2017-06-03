@@ -44,8 +44,7 @@ install_ncurses() {
         tar -zxvf ncurses-6.0.tar.gz
 
         # for gcc5 bug(Ubuntu16.04)
-        git clone https://github.com/tydk27/patch.git
-        cp "${work_dir}/patch/ncurses-6.0-gcc5.patch" "${work_dir}/ncurses-6.0/ncurses/base/"
+        cp "${work_dir}/dotfiles/patch/ncurses-6.0-gcc5.patch" "${work_dir}/ncurses-6.0/ncurses/base/"
         cd "${work_dir}/ncurses-6.0/ncurses/base"
         patch < ncurses-6.0-gcc5.patch
     fi
