@@ -35,6 +35,19 @@ fi
 export LSCOLORS=gxfxcxdxbxegedabagacag
 export LS_COLORS='di=36;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;46'
 
+if [ -x /usr/local/bin/dircolors ] && [ `eval uname` = 'FreeBSD' ]; then
+    export LSCOLORS=ExGxdxdxCxDxDxBxBxegeg
+    alias ls='ls -G'
+    alias dir='dir --color=auto'
+    alias grep='grep --color=auto'
+elif [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias grep='grep --color=auto'
+fi
+
+
 # Gitのブランチ名をプロンプトに表示させる
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' max-exports 6
@@ -76,14 +89,6 @@ zmodload zsh/system         # syserror sysread syswrite
 zmodload zsh/zprof          # シェル関数プロファイリング
 
 # エイリアス
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias dir='dir --color=auto'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
 alias copy='cp -ip'
 alias del='rm -i'
 alias move='mv -i'
