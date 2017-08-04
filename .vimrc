@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/06/04
+"   updated_at 2017/08/04
 "
 " You will need to have vim >= 8.0
 "
@@ -545,11 +545,10 @@ if s:dein_enabled
     let php_parent_error_open = 1
 
     let g:php_cs_fixer_path = s:pcf_path
-    let g:php_cs_fixer_level = 'psr2'
-    let g:php_cs_fixer_config = 'default'
+    let g:php_cs_fixer_rules = '@PSR2'
+    " let g:php_cs_fixer_cache = '.php_cs.cache'
     " let g:php_cs_fixer_config_file = '.php_cs'
     let g:php_cs_fixer_php_path = 'php'
-    " let g:php_cs_fixer_fixers_list = 'linefeed,short_tag,indentation'
     let g:php_cs_fixer_enable_default_mapping = 1
     let g:php_cs_fixer_dry_run = 0
     let g:php_cs_fixer_verbose = 0
