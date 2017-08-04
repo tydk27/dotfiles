@@ -108,8 +108,8 @@ setopt prompt_subst         # プロンプト
 
 # ヒストリー
 HISTFILE=~/.zhistory
-HISTSIZE=200
-SAVEHIST=180
+HISTSIZE=2000
+SAVEHIST=18000
 setopt append_history       # ヒストリファイルに追記
 setopt extended_history     # ヒストリを拡張フォーマットで保存
 setopt hist_ignore_all_dups # 同一コマンドは保存しない
