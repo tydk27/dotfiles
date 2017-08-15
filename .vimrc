@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/08/04
+"   updated_at 2017/08/15
 "
 " You will need to have vim >= 8.0
 "
@@ -16,7 +16,7 @@
 " extra tool
 "   * ctags
 "   * lynx
-"   * php-cs-fixer
+"   * PHP CodeSniffer
 "   * GNU Global
 "   * clang
 "   * The Silver Searcher
@@ -123,9 +123,8 @@ if v:version >= 800
         " }}}
 
         " PHP {{{
-        " PHPコーディング規約チェック(php-cs-fixerをcomposerでインスコしておく)
-        " http://cs.sensiolabs.org/
-        call dein#add('stephpy/vim-php-cs-fixer')
+        call dein#add('beanworks/vim-phpfmt')
+        " call dein#add('stephpy/vim-php-cs-fixer')
         call dein#add('thinca/vim-ref')
         " }}}
 
@@ -305,8 +304,6 @@ endif
 if s:dein_enabled
     " path {{{
     " サードパーティのパスなど
-    let s:pcf_path       = $HOME . '/.composer/vendor/bin/php-cs-fixer'
-
     let s:php_dict_path  = $HOME . '/.vim/dict/php.dict'
     let s:lynx_path      = $HOME . '/local/bin/lynx'
     let s:phpmanual_path = $HOME . '/.vim/ref/php-chunked-xhtml'
@@ -544,15 +541,15 @@ if s:dein_enabled
     let php_parent_error_close = 1
     let php_parent_error_open = 1
 
-    let g:php_cs_fixer_path = s:pcf_path
-    let g:php_cs_fixer_rules = '@PSR2'
-    " let g:php_cs_fixer_cache = '.php_cs.cache'
-    " let g:php_cs_fixer_config_file = '.php_cs'
-    let g:php_cs_fixer_php_path = 'php'
-    let g:php_cs_fixer_enable_default_mapping = 1
-    let g:php_cs_fixer_dry_run = 0
-    let g:php_cs_fixer_verbose = 0
-    nnoremap <silent><leader>pcf :call PhpCsFixerFixFile()<CR>
+    " let g:php_cs_fixer_rules = '@PSR2'
+    " let g:php_cs_fixer_php_path = 'php'
+    " let g:php_cs_fixer_enable_default_mapping = 1
+    " let g:php_cs_fixer_dry_run = 0
+    " let g:php_cs_fixer_verbose = 0
+    " nnoremap <silent><leader>pcf :call PhpCsFixerFixFile()<CR>
+
+    let g:phpfmt_standard = 'PSR2'
+    let g:phpfmt_autosave = 1
 
     " for JSX
     let g:jsx_ext_required = 0
