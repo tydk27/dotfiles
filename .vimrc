@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2017/08/15
+"   updated_at 2017/08/17
 "
 " You will need to have vim >= 8.0
 "
@@ -146,6 +146,7 @@ if v:version >= 800
         call dein#add('pangloss/vim-javascript')
         call dein#add('mxw/vim-jsx')
         call dein#add('othree/yajs.vim')
+        call dein#add('posva/vim-vue')
 
         call dein#add('elzr/vim-json')
         " }}}
@@ -228,7 +229,7 @@ set autoread                          " 他で書き換えられたら自動で�
 set cindent                           " 賢いインデント調整
 set ruler                             " 行番号と列番号を表示
 set showcmd                           " コマンドを表示
-set title                             " ファイル名を表示
+set notitle                           " Thanks for flying Vim
 set number                            " 行番号表示
 set ignorecase                        " 大文字小文字を無視して検索
 set smartcase                         " 大文字を入力すると大文字小文字無視を解除
@@ -291,7 +292,7 @@ if &term =~ "xterm"
     let &t_EI .= "\e[?2004l"
     let &pastetoggle = "\e[201~"
 
-    function XTermPasteBegin(ret)
+    function! XTermPasteBegin(ret)
         set paste
         return a:ret
     endfunction
@@ -556,7 +557,7 @@ if s:dein_enabled
     " }}}
 
     " Unite {{{
-    let g:unite_enable_start_insert = 0
+    let g:unite_enable_start_insert = 1
     let g:unite_enable_split_vertically = 0
     let g:unite_enable_ignore_case = 1
     let g:unite_enable_smart_case = 1
@@ -590,6 +591,7 @@ if s:dein_enabled
     " }}}
 
     " NERDTreeToggle {{{
+    " エクスプローラー風
     nnoremap <silent><C-e> :NERDTreeToggle<CR>
     " }}}
 
@@ -673,14 +675,14 @@ endif
 augroup indentgroup
     autocmd!
     " vim-scripts/smarty-syntax が絶望的に重いのでHTMLで代用
-    autocmd BufRead,BufNewFile *.tpl set filetype=html
-    " scssはsassとして扱う
-    autocmd BufRead,BufNewFile *.scss set filetype=sass
+    autocmd BufRead,BufNewFile *.tpl setlocal filetype=html
+    autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html
+    autocmd BufRead,BufNewFile *.scss setlocal filetype=css
 
     " フロントのインデント
     autocmd FileType javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd FileType vue        setlocal tabstop=2 softtabstop=2 shiftwidth=2
     autocmd FileType html       setlocal tabstop=4 softtabstop=4 shiftwidth=4
-    autocmd FileType sass       setlocal tabstop=2 softtabstop=2 shiftwidth=2
     autocmd FileType css        setlocal tabstop=2 softtabstop=2 shiftwidth=2
 augroup END
 
