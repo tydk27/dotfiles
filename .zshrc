@@ -31,11 +31,15 @@ if is-at-least 4.3.10; then
     add-zsh-hook chpwd chpwd_recent_dirs
 fi
 
+# mac用に調整
+export PATH="$HOME/local/bin:$PATH"
+
 # 色々
 export LSCOLORS=gxfxcxdxbxegedabagacag
 export LS_COLORS='di=36;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;46'
 
-if [ -x /usr/local/bin/dircolors ] && [ `eval uname` = 'FreeBSD' ]; then
+os=`eval uname`
+if [ $os = 'FreeBSD' ] || [ $os = 'Darwin' ]; then
     export LSCOLORS=ExGxdxdxCxDxDxBxBxegeg
     alias ls='ls -G'
     alias dir='dir --color=auto'

@@ -16,5 +16,3 @@ export LD_LIBRARY_PATH="$HOME/local/lib:$LD_LIBRARY_PATH"
 # export GOROOT="$HOME/local/go"
 # export GOPATH="$HOME/.go"
 # export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
-
-export PATH="$HOME/local/bin:$PATH"
