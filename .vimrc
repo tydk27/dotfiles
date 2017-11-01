@@ -180,6 +180,7 @@ if v:version >= 800
         call dein#add('soramugi/auto-ctags.vim')
         " call dein#add('vim-scripts/gtags.vim')
         call dein#add('majutsushi/tagbar')
+        call dein#add('airblade/vim-gitgutter')
 
         " call dein#add('itchyny/vim-parenmatch')
         " call dein#add('itchyny/vim-cursorword')
