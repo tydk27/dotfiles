@@ -1,22 +1,13 @@
 "
 " My vimrc
-"   updated_at 2017/08/17
+"   updated_at 2018/04/13
 "
 " You will need to have vim >= 8.0
-"
-" compile option
-"   --with-local-dir=$HOME./local
-"   --with-features=huge
-"   --enable-luainterp=dynamic
-"   --with-luajit
-"   --with-lua-prefix=$HOME./local
-"   --with-tlib=ncurses
-"   --prefix=$HOME./local
 "
 " extra tool
 "   * ctags
 "   * lynx
-"   * PHP CodeSniffer
+"   * php-cs-fixer
 "   * GNU Global
 "   * clang
 "   * The Silver Searcher
@@ -85,16 +76,20 @@ if v:version >= 800
         call dein#add('Shougo/neosnippet-snippets')
 
         call dein#add('thinca/vim-quickrun')
+        call dein#add('osyo-manga/shabadou.vim')
 
         " call dein#add('scrooloose/syntastic')
-        call dein#add('osyo-manga/shabadou.vim')
         call dein#add('osyo-manga/vim-watchdogs')
-        " call dein#add('jceb/vim-hier')
+        call dein#add('jceb/vim-hier') " QuickFixハイライト
 
         call dein#add('tpope/vim-fugitive')
+
         call dein#add('ctrlpvim/ctrlp.vim')
-        call dein#add('rking/ag.vim')
-        " call dein#add('osyo-manga/vim-anzu')
+        call dein#add('osyo-manga/vim-anzu')
+
+        if executable('ag')
+            call dein#add('rking/ag.vim')
+        endif
 
         call dein#add('junegunn/vim-easy-align')
         call dein#add('h1mesuke/vim-alignta')
@@ -107,25 +102,27 @@ if v:version >= 800
         call dein#add('Shougo/unite-outline')
         call dein#add('ujihisa/unite-colorscheme')
         call dein#add('Shougo/neomru.vim')
-        call dein#add('scrooloose/nerdtree')
         " }}}
 
         " ColorScheme {{{
         call dein#add('sjl/badwolf')
         call dein#add('dracula/vim')
-        " call dein#add('tomasr/molokai')
+        call dein#add('tomasr/molokai')
         call dein#add('AlessandroYorba/Alduin')
+        call dein#add('morhetz/gruvbox')
         " }}}
 
-        " vim-line {{{
+        " statusline {{{
         call dein#add('itchyny/lightline.vim')
         " call dein#add('Lokaltog/vim-powerline')
         " }}}
 
         " PHP {{{
-        call dein#add('beanworks/vim-phpfmt')
-        " call dein#add('stephpy/vim-php-cs-fixer')
-        call dein#add('thinca/vim-ref')
+        if executable('php')
+            " call dein#add('beanworks/vim-phpfmt')
+            call dein#add('stephpy/vim-php-cs-fixer')
+            call dein#add('thinca/vim-ref')
+        endif
         " }}}
 
         " HTML CSS {{{
@@ -152,19 +149,25 @@ if v:version >= 800
         " }}}
 
         " C++ {{{
-        call dein#add('justmao945/vim-clang')
+        if executable('clang')
+            call dein#add('justmao945/vim-clang')
+            call dein#add('osyo-manga/vim-marching')
+            call dein#add('rhysd/vim-clang-format')
+        endif
         call dein#add('vim-jp/cpp-vim')
-        " call dein#add('osyo-manga/vim-marching')
-        " call dein#add('rhysd/vim-clang-format')
         " }}}
 
         " Go lang {{{
-        call dein#add('fatih/vim-go')
+        if executable('go')
+            call dein#add('fatih/vim-go')
+        endif
         " }}}
 
         " Rust {{{
-        call dein#add('rust-lang/rust.vim')
-        call dein#add('racer-rust/vim-racer')
+        if executable('rustc')
+            call dein#add('rust-lang/rust.vim')
+            call dein#add('racer-rust/vim-racer')
+        endif
         " }}}
 
         " Markdown {{{
@@ -176,11 +179,18 @@ if v:version >= 800
 
         " extra tool {{{
         call dein#add('vim-scripts/sudo.vim')
-        " call dein#add('thinca/vim-scouter')
-        call dein#add('soramugi/auto-ctags.vim')
-        " call dein#add('vim-scripts/gtags.vim')
+        if executable('ctags')
+            call dein#add('soramugi/auto-ctags.vim')
+        endif
+        if executable('global')
+            call dein#add('vim-scripts/gtags.vim')
+        endif
         call dein#add('majutsushi/tagbar')
-        call dein#add('airblade/vim-gitgutter')
+
+        " call dein#add('scrooloose/nerdtree')
+        " call dein#add('airblade/vim-gitgutter')
+
+        " call dein#add('thinca/vim-scouter')
 
         " call dein#add('itchyny/vim-parenmatch')
         " call dein#add('itchyny/vim-cursorword')
@@ -211,8 +221,12 @@ set t_Co=256
 if s:dein_enabled
     " colorscheme badwolf
     " colorscheme dracula
-    let g:alduin_Shout_Dragon_Aspect = 1
+
+    let g:alduin_Shout_Become_Ethereal = 1
     colorscheme alduin
+
+    " colorscheme gruvbox
+    " let g:gruvbox_contrast_light = 'hard'
 else
     colorscheme desert
 endif
@@ -305,9 +319,7 @@ endif
 " Plugins Configure {{{
 if s:dein_enabled
     " path {{{
-    " サードパーティのパスなど
     let s:php_dict_path  = $HOME . '/.vim/dict/php.dict'
-    let s:lynx_path      = $HOME . '/local/bin/lynx'
     let s:phpmanual_path = $HOME . '/.vim/ref/php-chunked-xhtml'
 
     let s:rustfmt_path   = $HOME . '/.cargo/bin/rustfmt'
@@ -316,29 +328,35 @@ if s:dein_enabled
     " }}}
 
     " lightline {{{
-    let g:lightline = {
-                \ 'colorscheme': 'wombat',
-                \ 'active': {
-                \   'left': [ ['mode', 'paste'], ['readonly', 'filename', 'modified'] ],
-                \   'right': [ ['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype'] ]
-                \ },
-                \ 'component_function': {
-                \   'modified'     : 'LightLineModified',
-                \   'readonly'     : 'LightLineReadonly',
-                \   'fugitive'     : 'LightLineFugitive',
-                \   'filename'     : 'LightLineFilename',
-                \   'fileformat'   : 'LightLineFileformat',
-                \   'filetype'     : 'LightLineFiletype',
-                \   'fileencoding' : 'LightLineFileencoding',
-                \   'mode'         : 'LightLineMode',
-                \ },
-                \ }
+    let g:lightline =
+    \    {
+    \        'colorscheme': 'wombat',
+    \
+    \        'active':
+    \        {
+    \            'left': [ ['mode', 'paste'], ['readonly', 'filename', 'modified', 'fugitive'], ['anzu'] ],
+    \            'right': [ ['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype'] ]
+    \        },
+    \
+    \        'component_function':
+    \        {
+    \            'modified'    : 'LightLineModified',
+    \            'readonly'    : 'LightLineReadonly',
+    \            'filename'    : 'LightLineFilename',
+    \            'fileformat'  : 'LightLineFileformat',
+    \            'filetype'    : 'LightLineFiletype',
+    \            'fileencoding': 'LightLineFileencoding',
+    \            'mode'        : 'LightLineMode',
+    \            'anzu'        : 'anzu#search_status',
+    \            'fugitive'    : 'fugitive#head'
+    \        },
+    \    }
 
-    let g:lightline.tabline = {
-                \ 'left': [
-                \   ['tabs']
-                \ ],
-                \ }
+    let g:lightline.tabline =
+    \    {
+    \        'left': [ ['tabs'] ],
+    \        'right': []
+    \    }
 
     function! LightLineModified()
         return &ft =~ 'help\|vimfiler\|gundo' ? '' : &modified ? '+' : &modifiable ? '' : '-'
@@ -349,20 +367,12 @@ if s:dein_enabled
     endfunction
 
     function! LightLineFilename()
-        return ('' != LightLineReadonly()        ? LightLineReadonly() . ' '    : '') .
-                    \ (&ft == 'vimfiler'         ? vimfiler#get_status_string() :
-                    \  &ft == 'unite'            ? unite#get_status_string()    :
-                    \  &ft == 'vimshell'         ? vimshell#get_status_string() :
-                    \ '' != expand('%:t')        ? expand('%:t')                : '[No Name]') .
-                    \ ('' != LightLineModified() ? ' ' . LightLineModified()    : '')
-    endfunction
-
-    function! LightLineFugitive()
-        if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head')
-            return fugitive#head()
-        else
-            return ''
-        endif
+        return (LightLineReadonly() != '' ? LightLineReadonly() . ' '  : '') .
+        \      (&ft == 'vimfiler' ? vimfiler#get_status_string() :
+        \      &ft == 'unite' ? unite#get_status_string() :
+        \      &ft == 'vimshell' ? vimshell#get_status_string() :
+        \      expand('%:t') != '' ? expand('%:t') : '[No Name]') .
+        \      (LightLineModified() != '' ? ' ' . LightLineModified() : '')
     endfunction
 
     function! LightLineFileformat()
@@ -378,24 +388,22 @@ if s:dein_enabled
     endfunction
 
     function! LightLineMode()
-        return  &ft == 'unite'          ? 'Unite' :
-                    \ &ft == 'vimfiler' ? 'VimFiler' :
-                    \ &ft == 'vimshell' ? 'VimShell' :
-                    \ winwidth(0) > 60  ? lightline#mode() : ''
+        return &ft == 'unite'    ? 'Unite' :
+        \      &ft == 'vimfiler' ? 'VimFiler' :
+        \      &ft == 'vimshell' ? 'VimShell' :
+        \      winwidth(0) > 60  ? lightline#mode() : ''
     endfunction
     " }}}
 
-    " vim-anzu {{{
-    " 動かないorz
-    " nmap n <Plug>(anzu-n-with-echo)
-    " nmap N <Plug>(anzu-N-with-echo)
-    " nmap * <Plug>(anzu-star-with-echo)
-    " nmap # <Plug>(anzu-sharp-with-echo)
-    " nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
-    " augroup vim-anzu
-    "     autocmd!
-    "     autocmd CursorHold,CursorHoldI,WinLeave,TabLeave * call anzu#clear_search_status()
-    " augroup END
+    " anzu {{{
+    nmap n <Plug>(anzu-n)
+    nmap N <Plug>(anzu-N)
+    nmap * <Plug>(anzu-star)
+    nmap # <Plug>(anzu-sharp)
+    augroup vim-anzu
+        autocmd!
+        autocmd WinLeave,TabLeave * call anzu#clear_search_status()
+    augroup END
     " }}}
 
     if has('lua')
@@ -410,10 +418,11 @@ if s:dein_enabled
         let g:neocomplete#enable_auto_close_preview = 0
         " let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 
-        let g:neocomplete#sources#dictionary#dictionaries = {
-                    \ 'default'  : '',
-                    \ 'php'      : s:php_dict_path
-                    \ }
+        let g:neocomplete#sources#dictionary#dictionaries =
+        \    {
+        \        'default'  : '',
+        \        'php'      : s:php_dict_path
+        \    }
 
         if !exists('g:neocomplete#keyword_patterns')
             let g:neocomplete#keyword_patterns = {}
@@ -442,10 +451,11 @@ if s:dein_enabled
         let g:neocomplcache_min_syntax_length = 3
         " let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
 
-        let g:neocomplcache_dictionary_filetype_lists = {
-                    \ 'default' : '',
-                    \ 'php'     : s:php_dict_path
-                    \ }
+        let g:neocomplcache_dictionary_filetype_lists =
+        \    {
+        \        'default'  : '',
+        \        'php'      : s:php_dict_path
+        \    }
 
         inoremap <expr><C-g> neocomplcache#undo_completion()
         inoremap <expr><C-l> neocomplcache#complete_common_string()
@@ -467,10 +477,8 @@ if s:dein_enabled
     " for vim-clang {{{
     if !exists('g:neocomplete#force_omni_input_patterns')
         let g:neocomplete#force_omni_input_patterns = {}
-        let g:neocomplete#force_omni_input_patterns.c =
-                    \ '[^.[:digit:] *\t]\%(\.\|->\)\w*'
-        let g:neocomplete#force_omni_input_patterns.cpp =
-                    \ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
+        let g:neocomplete#force_omni_input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)\w*'
+        let g:neocomplete#force_omni_input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
     endif
     " }}}
 
@@ -505,15 +513,16 @@ if s:dein_enabled
 
     " quickrun {{{
     let g:quickrun_config = get(g:, 'quickrun_config', {})
+    " 成功したらバッファ、失敗したらquickfixで表示
     let g:quickrun_config._ = {
-                \   'runner'                          : 'vimproc',
-                \   'runner/vimproc/updatetime'       : 60,
-                \   'outputter'                       : 'error',
-                \   'outputter/error/success'         : 'buffer',
-                \   'outputter/error/error'           : 'quickfix',
-                \   'outputter/buffer/split'          : ':rightbelow 8sp',
-                \   'outputter/buffer/close_on_empty' : 1,
-                \}
+    \    'runner'                          : 'vimproc',
+    \    'runner/vimproc/updatetime'       : 60,
+    \    'outputter'                       : 'error',
+    \    'outputter/error/success'         : 'buffer',
+    \    'outputter/error/error'           : 'quickfix',
+    \    'outputter/buffer/split'          : ':rightbelow 20',
+    \    'outputter/buffer/close_on_empty' : 1,
+    \}
     " }}}
 
     " syntax-check {{{
@@ -543,15 +552,16 @@ if s:dein_enabled
     let php_parent_error_close = 1
     let php_parent_error_open = 1
 
-    " let g:php_cs_fixer_rules = '@PSR2'
-    " let g:php_cs_fixer_php_path = 'php'
-    " let g:php_cs_fixer_enable_default_mapping = 1
-    " let g:php_cs_fixer_dry_run = 0
-    " let g:php_cs_fixer_verbose = 0
-    " nnoremap <silent><leader>pcf :call PhpCsFixerFixFile()<CR>
+    let g:php_cs_fixer_rules = '@PSR2'
+    let g:php_cs_fixer_php_path = 'php'
+    let g:php_cs_fixer_enable_default_mapping = 1
+    let g:php_cs_fixer_dry_run = 0
+    let g:php_cs_fixer_verbose = 0
+    nnoremap <silent><leader>pcf :call PhpCsFixerFixFile()<CR>
 
-    let g:phpfmt_standard = 'PSR2'
-    let g:phpfmt_autosave = 1
+    " let g:phpfmt_standard = 'PSR2'
+    " let g:phpfmt_autosave = 1
+    " let g:phpfmt_command = $HOME . '/.composer/vendor/bin/phpcbf'
 
     " for JSX
     let g:jsx_ext_required = 0
@@ -559,11 +569,7 @@ if s:dein_enabled
 
     " Unite {{{
     let g:unite_enable_start_insert = 1
-    let g:unite_enable_split_vertically = 0
-    let g:unite_enable_ignore_case = 1
-    let g:unite_enable_smart_case = 1
-    let g:unite_winheight = 15
-    let g:unite_winwidth = 40
+    let g:unite_winheight = 20
 
     noremap <C-B> :Unite buffer<CR>
     noremap <C-N> :Unite -buffer-name=file file<CR>
@@ -582,37 +588,35 @@ if s:dein_enabled
     " }}}
 
     " using ag {{{
-    if executable('ag')
-        let g:unite_source_grep_command = 'ag'
-        let g:unite_source_grep_default_opts = '--nogroup --nocolor --column'
-        let g:unite_source_grep_recursive_opt = ''
+    let g:unite_source_grep_command = 'ag'
+    let g:unite_source_grep_default_opts = '--nogroup --nocolor --column'
+    let g:unite_source_grep_recursive_opt = ''
 
-        let g:ctrlp_user_command = 'ag %s -l'
-    endif
+    let g:ctrlp_user_command = 'ag %s -l'
     " }}}
 
     " NERDTreeToggle {{{
-    " エクスプローラー風
-    nnoremap <silent><C-e> :NERDTreeToggle<CR>
+    " nnoremap <silent><C-e> :NERDTreeToggle<CR>
     " }}}
 
     " php Reference {{{
-    let g:ref_phpmanual_cmd = s:lynx_path . ' -dump %s'
-    let g:ref_source_webdict_cmd = s:lynx_path . ' -dump %s'
+    let g:ref_phpmanual_cmd = 'lynx -dump %s'
+    let g:ref_source_webdict_cmd = 'lynx -dump %s'
     let g:ref_phpmanual_path = s:phpmanual_path
 
     " webdict設定
-    let g:ref_source_webdict_sites = {
-                \   'je': {
-                \     'url': 'http://dictionary.infoseek.ne.jp/jeword/%s',
-                \   },
-                \   'ej': {
-                \     'url': 'http://dictionary.infoseek.ne.jp/ejword/%s',
-                \   },
-                \   'wiki': {
-                \     'url': 'https://ja.wikipedia.org/wiki/%s',
-                \   },
-                \ }
+    let g:ref_source_webdict_sites =
+    \    {
+    \        'je': {
+    \            'url': 'http://dictionary.infoseek.ne.jp/jeword/%s',
+    \        },
+    \        'ej': {
+    \            'url': 'http://dictionary.infoseek.ne.jp/ejword/%s',
+    \        },
+    \        'wiki': {
+    \            'url': 'https://ja.wikipedia.org/wiki/%s',
+    \        },
+    \    }
     let g:ref_source_webdict_sites.default = 'ej'
 
     function! g:ref_source_webdict_sites.je.filter(output)
@@ -639,18 +643,21 @@ if s:dein_enabled
     " ctags {{{
     let g:auto_ctags = 0
     let g:auto_ctags_tags_args = '--append=yes --recurse=yes --sort=yes --languages=PHP,C,C++'
-    nnoremap <F3> :<C-u>tab stj <C-R>=expand('<cword>')<CR><CR>
+    if executable('ctags')
+        nnoremap <F3> :<C-u>tab stj <C-R>=expand('<cword>')<CR><CR>
 
-    nnoremap <F8> :TagbarToggle<CR>
+        nnoremap <F8> :TagbarToggle<CR>
+    endif
     " }}}
 
     " gtags {{{
-    nnoremap <C-f> :Gtags -f %<CR>
-    nnoremap <C-j> :GtagsCursor<CR>
+    if executable('global')
+        nnoremap <C-f> :Gtags -f %<CR>
+        nnoremap <C-j> :GtagsCursor<CR>
+    endif
     " }}}
 
     " インデント可視化 {{{
-    " 良い感じのプラギンが無く、見た目キモいので一旦消しておく
     " let g:indent_guides_enable_on_vim_startup = 1
     " let g:indent_guides_start_level = 4
     " let g:indent_guides_guide_size = 1
@@ -698,10 +705,11 @@ inoremap '<Enter> ''<LEFT>
 nnoremap Y y$
 
 " 検索単語を画面中央に
-nnoremap n nzz
-nnoremap N Nzz
-nnoremap * *zz
-nnoremap # #zz
+" anzuと競合するところはコメントアウト
+" nnoremap n nzz
+" nnoremap N Nzz
+" nnoremap * *zz
+" nnoremap # #zz
 nnoremap g* g*zz
 nnoremap g# g#zz
 
@@ -727,5 +735,13 @@ augroup grepopen
     autocmd!
     autocmd QuickfixCmdPost vimgrep cw
 augroup END
+
+" カーソル位置を記憶する
+if has("autocmd")
+    autocmd BufReadPost *
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal g`\"" |
+    \ endif
+endif
 
 filetype plugin indent on
