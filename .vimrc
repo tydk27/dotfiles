@@ -223,6 +223,7 @@ augroup END
 
 set t_Co=256
 if s:dein_enabled
+    " colorscheme molokai
     " colorscheme badwolf
     " colorscheme dracula
 
@@ -293,17 +294,17 @@ highlight Pmenu ctermbg     = 4
 highlight PmenuSel ctermbg  = 1
 highlight PMenuSbar ctermbg = 4
 
-" マウスで弄る(使いづらいし、マウスは邪道なので消す)
-" if has('mouse')
-"     set mouse=a
-"     if has('mouse_sgr')
-"         set ttymouse=sgr
-"     elseif v:version > 703 || v:version is 703 && has('patch632')
-"         set ttymouse=sgr
-"     else
-"         set ttymouse=xterm2
-"     endif
-" endif
+" マウスで弄る
+if has('mouse')
+    set mouse=a
+    if has('mouse_sgr')
+        set ttymouse=sgr
+    elseif v:version > 703 || v:version is 703 && has('patch632')
+        set ttymouse=sgr
+    else
+        set ttymouse=xterm2
+    endif
+endif
 
 " 良い感じにペーストする
 if &term =~ "xterm"
@@ -424,8 +425,8 @@ if s:dein_enabled
 
         let g:neocomplete#sources#dictionary#dictionaries =
         \    {
-        \        'default'  : '',
-        \        'php'      : s:php_dict_path
+        \        'default': '',
+        \        'php'    : s:php_dict_path
         \    }
 
         if !exists('g:neocomplete#keyword_patterns')
@@ -457,8 +458,8 @@ if s:dein_enabled
 
         let g:neocomplcache_dictionary_filetype_lists =
         \    {
-        \        'default'  : '',
-        \        'php'      : s:php_dict_path
+        \        'default': '',
+        \        'php'    : s:php_dict_path
         \    }
 
         inoremap <expr><C-g> neocomplcache#undo_completion()
@@ -486,10 +487,13 @@ if s:dein_enabled
     endif
     " }}}
 
-    autocmd FileType html,markdown,tpl setlocal omnifunc=htmlcomplete#CompleteTags
-    autocmd FileType css               setlocal omnifunc=csscomplete#CompleteCSS
-    autocmd FileType javascript        setlocal omnifunc=javascriptcomplete#CompleteJS
-    autocmd filetype xml               setlocal omnifunc=xmlcomplete#completetags
+    augroup vim-omni
+        autocmd!
+        autocmd FileType html,markdown,tpl setlocal omnifunc=htmlcomplete#CompleteTags
+        autocmd FileType css               setlocal omnifunc=csscomplete#CompleteCSS
+        autocmd FileType javascript        setlocal omnifunc=javascriptcomplete#CompleteJS
+        autocmd filetype xml               setlocal omnifunc=xmlcomplete#completetags
+    augroup END
 
     " Snippet {{{
     imap <C-k> <Plug>(neosnippet_expand_or_jump)
@@ -512,7 +516,10 @@ if s:dein_enabled
     let g:clang_cpp_options = '-std=c++1z -stdlib=libc++ --pedantic-errors'
     let g:clang_format_style = 'Google'
 
-    autocmd BufWrite,FileWritePre,FileAppendPre *.[ch]pp call ClangFormat()
+    augroup vim-clang
+        autocmd!
+        autocmd BufWrite,FileWritePre,FileAppendPre *.[ch]pp call ClangFormat()
+    augroup END
     " }}}
 
     " quickrun {{{
@@ -539,9 +546,11 @@ if s:dein_enabled
     " let g:syntastic_scss_checkers = ['scss_lint']
     " let g:syntastic_loc_list_height = 5
 
-    " au BufRead,BufNewFile *.php set makeprg=php\ -l\ %
-    " au BufRead,BufNewFile *.php set errorformat=%m\ in\ %f\ on\ line\ %l
-    " autocmd FileType php map <c-c><c-c> :make<cr> :cw<cr><cr>
+    augroup vim-syntastic
+        " autocmd BufRead,BufNewFile *.php set makeprg=php\ -l\ %
+        " autocmd BufRead,BufNewFile *.php set errorformat=%m\ in\ %f\ on\ line\ %l
+        " autocmd FileType php map <c-c><c-c> :make<cr> :cw<cr><cr>
+    augroup END
 
     " watchdogs
     let g:watchdogs_check_BufWritePost_enable = 1
@@ -573,6 +582,7 @@ if s:dein_enabled
 
     " Unite {{{
     let g:unite_enable_start_insert = 1
+    let g:unite_source_history_yank_enable =1
     let g:unite_winheight = 20
 
     noremap <C-B> :Unite buffer<CR>
@@ -580,12 +590,15 @@ if s:dein_enabled
     noremap <C-Z> :Unite file_mru<CR>
     noremap :uff :<C-u>UniteWithBufferDir file -buffer-name=file<CR>
 
-    " au FileType unite nnoremap <silent> <buffer> <expr> <C-J> unite#do_action('split')
-    " au FileType unite inoremap <silent> <buffer> <expr> <C-J> unite#do_action('split')
-    " au FileType unite nnoremap <silent> <buffer> <expr> <C-K> unite#do_action('vsplit')
-    " au FileType unite inoremap <silent> <buffer> <expr> <C-K> unite#do_action('vsplit')
-    au FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
-    au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
+    augroup vim-unite
+        autocmd!
+        " autocmd FileType unite nnoremap <silent> <buffer> <expr> <C-J> unite#do_action('split')
+        " autocmd FileType unite inoremap <silent> <buffer> <expr> <C-J> unite#do_action('split')
+        " autocmd FileType unite nnoremap <silent> <buffer> <expr> <C-K> unite#do_action('vsplit')
+        " autocmd FileType unite inoremap <silent> <buffer> <expr> <C-K> unite#do_action('vsplit')
+        autocmd FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
+        autocmd FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
+    augroup END
 
     nnoremap <silent> ,g  :<C-u>Unite grep:. -buffer-name=search-buffer<CR>
     nnoremap <silent> ,cg :<C-u>Unite grep:. -buffer-name=search-buffer<CR><C-R><C-W>
@@ -639,7 +652,10 @@ if s:dein_enabled
     nnoremap <Leader>rj :<C-u>Ref webdict je<Space>
     nnoremap <Leader>rw :<C-u>Ref webdict wiki<Space>
 
-    autocmd FileType ref-* nnoremap <buffer> <silent> q :<C-u>close<CR>
+    augroup vim-webdict
+        autocmd!
+        autocmd FileType ref-* nnoremap <buffer> <silent> q :<C-u>close<CR>
+    augroup END
     " }}}
 
     " VimShell {{{
@@ -686,20 +702,6 @@ if s:dein_enabled
 endif
 " }}} プラギン設定ここまで
 
-augroup indentgroup
-    autocmd!
-    " vim-scripts/smarty-syntax が絶望的に重いのでHTMLで代用
-    autocmd BufRead,BufNewFile *.tpl setlocal filetype=html
-    autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css
-    autocmd BufRead,BufNewFile *.scss setlocal filetype=css
-
-    " フロントのインデント
-    autocmd FileType javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
-    autocmd FileType vue        setlocal tabstop=2 softtabstop=2 shiftwidth=2
-    autocmd FileType html       setlocal tabstop=4 softtabstop=4 shiftwidth=4
-    autocmd FileType css        setlocal tabstop=2 softtabstop=2 shiftwidth=2
-augroup END
-
 " 自動で閉じ括弧付けるのはウザいのでエンターで閉じさせる
 inoremap {<Enter> {}<LEFT>
 inoremap [<Enter> []<LEFT>
@@ -727,27 +729,38 @@ vnoremap <Tab> %
 nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
 nnoremap <silent> <C-c><C-c> :nohlsearch<CR>
 
-" 保存時に各行末の空白を除去
 function! s:remove_dust()
     let cursor = getpos('.')
     %s/\s\+$//ge
     call setpos('.', cursor)
     unlet cursor
 endfunction
-autocmd BufWritePre * call <SID>remove_dust()
 
-" vimgrepの結果は常にQuickFixで開く
-augroup grepopen
+function! s:remember_lastline()
+    if line("'\"") > 0 && line("'\"") <= line("$")
+        exe "normal g`\""
+    endif
+endfunction
+
+augroup cmdGroup
     autocmd!
-    autocmd QuickfixCmdPost vimgrep cw
-augroup END
 
-" カーソル位置を記憶する
-if has("autocmd")
-    autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal g`\"" |
-    \ endif
-endif
+    autocmd BufRead,BufNewFile *.tpl setlocal filetype=html
+    autocmd BufRead,BufNewFile *.scss setlocal filetype=css
+
+    autocmd FileType html       setlocal tabstop=4 softtabstop=4 shiftwidth=4
+    autocmd FileType css        setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd FileType javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd FileType vue        setlocal tabstop=2 softtabstop=2 shiftwidth=2
+
+    " vimgrepの結果は常にQuickFixで開く
+    autocmd QuickfixCmdPost vimgrep cw
+
+    " 保存時に各行末の空白を除去
+    autocmd BufWritePre * call s:remove_dust()
+
+    " カーソル位置を記憶する
+    autocmd BufReadPost * call s:remember_lastline()
+augroup END
 
 filetype plugin indent on
