@@ -11,6 +11,7 @@
 "   * GNU Global
 "   * clang
 "   * The Silver Searcher
+"   * eslint
 "
 
 " for japanese
@@ -525,15 +526,19 @@ if s:dein_enabled
     " quickrun {{{
     let g:quickrun_config = get(g:, 'quickrun_config', {})
     " 成功したらバッファ、失敗したらquickfixで表示
-    let g:quickrun_config._ = {
-    \    'runner'                          : 'vimproc',
-    \    'runner/vimproc/updatetime'       : 60,
-    \    'outputter'                       : 'error',
-    \    'outputter/error/success'         : 'buffer',
-    \    'outputter/error/error'           : 'quickfix',
-    \    'outputter/buffer/split'          : ':rightbelow 20',
-    \    'outputter/buffer/close_on_empty' : 1,
-    \}
+    let g:quickrun_config._ =
+    \    {
+    \        'runner'                          : 'vimproc',
+    \        'runner/vimproc/updatetime'       : 60,
+    \        'outputter'                       : 'error',
+    \        'outputter/error/success'         : 'buffer',
+    \        'outputter/error/error'           : 'quickfix',
+    \        'outputter/buffer/split'          : ':rightbelow 20',
+    \        'outputter/buffer/close_on_empty' : 1,
+    \    }
+    if executable('eslint')
+        let g:quickrun_config['javascript/watchdogs_checker'] = { 'type' : 'watchdogs_checker/eslint' }
+    endif
     " }}}
 
     " syntax-check {{{
@@ -553,8 +558,6 @@ if s:dein_enabled
     augroup END
 
     " watchdogs
-    let g:watchdogs_check_BufWritePost_enable = 1
-    " let g:watchdogs_check_CursorHold_enable = 1
     call watchdogs#setup(g:quickrun_config)
 
     let php_sql_query = 1
