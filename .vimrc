@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2018/04/13
+"   updated_at 2018/04/18
 "
 " You will need to have vim >= 8.0
 "
@@ -127,22 +127,26 @@ if v:version >= 800
 
         " HTML CSS {{{
         call dein#add('vim-scripts/HTML-AutoCloseTag')
-        call dein#add('mattn/emmet-vim')
-        call dein#add('othree/html5.vim')
         call dein#add('hokaccha/vim-html5validator')
+        " call dein#add('othree/html5.vim')
 
-        call dein#add('hail2u/vim-css3-syntax')
-        call dein#add('gko/vim-coloresque')
+        " call dein#add('hail2u/vim-css3-syntax')
+
+        " call dein#add('gko/vim-coloresque')
+        " call dein#add('mattn/emmet-vim')
 
         " call dein#add('vim-scripts/smarty-syntax')
         " }}}
 
         " JavaScript {{{
+        " call dein#add('pangloss/vim-javascript')
         call dein#add('jelera/vim-javascript-syntax')
-        call dein#add('AndrewRadev/splitjoin.vim')
-        call dein#add('pangloss/vim-javascript')
-        call dein#add('mxw/vim-jsx')
-        call dein#add('othree/yajs.vim')
+        " call dein#add('othree/yajs.vim')
+        " call dein#add('othree/es.next.syntax.vim')
+
+        " call dein#add('AndrewRadev/splitjoin.vim')
+
+        " call dein#add('mxw/vim-jsx')
         call dein#add('posva/vim-vue')
 
         call dein#add('elzr/vim-json')
@@ -686,7 +690,7 @@ augroup indentgroup
     autocmd!
     " vim-scripts/smarty-syntax が絶望的に重いのでHTMLで代用
     autocmd BufRead,BufNewFile *.tpl setlocal filetype=html
-    autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html
+    autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css
     autocmd BufRead,BufNewFile *.scss setlocal filetype=css
 
     " フロントのインデント
