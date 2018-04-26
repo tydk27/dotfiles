@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2018/04/18
+"   updated_at 2018/04/26
 "
 " You will need to have vim >= 8.0
 "
@@ -11,7 +11,8 @@
 "   * GNU Global
 "   * clang
 "   * The Silver Searcher
-"   * eslint
+"   * Prettier
+"   * FZF
 "
 
 " for japanese
@@ -53,7 +54,11 @@ if v:version >= 800
             let s:dein_repo = 'https://github.com/' . s:dein_repo_name
             call system('git clone ' . s:dein_repo . ' ' . s:dein_repo_dir)
         endif
-        let &runtimepath = &runtimepath . ',' . s:dein_repo_dir
+
+        " fzf
+        let s:fzf_dir = $HOME . '/.fzf'
+
+        let &runtimepath = &runtimepath . ',' . s:dein_repo_dir . ',' . s:fzf_dir
     endif
 
     if dein#load_state(s:dein_dir)
@@ -78,6 +83,8 @@ if v:version >= 800
 
         call dein#add('thinca/vim-quickrun')
         call dein#add('osyo-manga/shabadou.vim')
+
+        call dein#add('sbdchd/neoformat')
 
         " call dein#add('scrooloose/syntastic')
         call dein#add('osyo-manga/vim-watchdogs')
@@ -190,6 +197,9 @@ if v:version >= 800
         if executable('global')
             call dein#add('vim-scripts/gtags.vim')
         endif
+        if executable('fzf')
+            call dein#add('junegunn/fzf.vim')
+        endif
         call dein#add('majutsushi/tagbar')
 
         " call dein#add('scrooloose/nerdtree')
@@ -216,7 +226,7 @@ endif
 syntax enable
 
 " 全角スペースを強調表示する
-augroup highlightZenkaku
+augroup highlightZenkakuGroup
     autocmd!
     autocmd ColorScheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
     autocmd VimEnter,WinEnter * match IdeographicSpace /　/
@@ -406,7 +416,7 @@ if s:dein_enabled
     nmap N <Plug>(anzu-N)
     nmap * <Plug>(anzu-star)
     nmap # <Plug>(anzu-sharp)
-    augroup vim-anzu
+    augroup anzuGroup
         autocmd!
         autocmd WinLeave,TabLeave * call anzu#clear_search_status()
     augroup END
@@ -438,10 +448,10 @@ if s:dein_enabled
         inoremap <expr><C-g> neocomplete#undo_completion()
         inoremap <expr><C-l> neocomplete#complete_common_string()
 
-        inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
         function! s:my_cr_function()
             return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
         endfunction
+        inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
 
         inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 
@@ -466,10 +476,10 @@ if s:dein_enabled
         inoremap <expr><C-g> neocomplcache#undo_completion()
         inoremap <expr><C-l> neocomplcache#complete_common_string()
 
-        inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
         function! s:my_cr_function()
             return neocomplcache#smart_close_popup() . "\<CR>"
         endfunction
+        inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
 
         inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
@@ -488,7 +498,7 @@ if s:dein_enabled
     endif
     " }}}
 
-    augroup vim-omni
+    augroup omniGroup
         autocmd!
         autocmd FileType html,markdown,tpl setlocal omnifunc=htmlcomplete#CompleteTags
         autocmd FileType css               setlocal omnifunc=csscomplete#CompleteCSS
@@ -517,7 +527,7 @@ if s:dein_enabled
     let g:clang_cpp_options = '-std=c++1z -stdlib=libc++ --pedantic-errors'
     let g:clang_format_style = 'Google'
 
-    augroup vim-clang
+    augroup clangGroup
         autocmd!
         autocmd BufWrite,FileWritePre,FileAppendPre *.[ch]pp call ClangFormat()
     augroup END
@@ -541,6 +551,15 @@ if s:dein_enabled
     endif
     " }}}
 
+    augroup neoformatGroup
+        autocmd!
+        autocmd FileType javascript setlocal formatprg=prettier\ --stdin\ --no-semi\ --single-quote
+        let g:neoformat_try_formatprg = 1
+
+        " 保存時に自動整形
+        " autocmd BufWritePre * undojoin | Neoformat
+    augroup END
+
     " syntax-check {{{
     " let g:syntastic_always_populate_loc_list = 1
     " let g:syntastic_auto_loc_list = 1
@@ -551,7 +570,7 @@ if s:dein_enabled
     " let g:syntastic_scss_checkers = ['scss_lint']
     " let g:syntastic_loc_list_height = 5
 
-    augroup vim-syntastic
+    augroup syntasticGroup
         " autocmd BufRead,BufNewFile *.php set makeprg=php\ -l\ %
         " autocmd BufRead,BufNewFile *.php set errorformat=%m\ in\ %f\ on\ line\ %l
         " autocmd FileType php map <c-c><c-c> :make<cr> :cw<cr><cr>
@@ -593,7 +612,7 @@ if s:dein_enabled
     noremap <C-Z> :Unite file_mru<CR>
     noremap :uff :<C-u>UniteWithBufferDir file -buffer-name=file<CR>
 
-    augroup vim-unite
+    augroup uniteGroup
         autocmd!
         " autocmd FileType unite nnoremap <silent> <buffer> <expr> <C-J> unite#do_action('split')
         " autocmd FileType unite inoremap <silent> <buffer> <expr> <C-J> unite#do_action('split')
@@ -655,7 +674,7 @@ if s:dein_enabled
     nnoremap <Leader>rj :<C-u>Ref webdict je<Space>
     nnoremap <Leader>rw :<C-u>Ref webdict wiki<Space>
 
-    augroup vim-webdict
+    augroup webdictGroup
         autocmd!
         autocmd FileType ref-* nnoremap <buffer> <silent> q :<C-u>close<CR>
     augroup END
@@ -750,6 +769,9 @@ augroup cmdGroup
 
     autocmd BufRead,BufNewFile *.tpl setlocal filetype=html
     autocmd BufRead,BufNewFile *.scss setlocal filetype=css
+
+    autocmd FileType vue syntax sync fromstart
+    autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css
 
     autocmd FileType html       setlocal tabstop=4 softtabstop=4 shiftwidth=4
     autocmd FileType css        setlocal tabstop=2 softtabstop=2 shiftwidth=2
