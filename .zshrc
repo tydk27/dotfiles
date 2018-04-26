@@ -1,26 +1,17 @@
 # zplug
-if [ -d ~/.zplug ]; then
-    source ~/.zplug/init.zsh
+source ~/.zplug/init.zsh
 
-    zplug 'yous/vanilli.sh'                            # バニラなzsh
-    zplug 'zsh-users/zsh-autosuggestions'              # 候補デフォルト表示
-    zplug 'zsh-users/zsh-completions'                  # 補完強化
-    zplug 'zsh-users/zsh-syntax-highlighting', defer:2 # zshシンタックスハイライト
-    zplug 'mollifier/anyframe'                         # pecopecoharapeko
-    zplug 'mollifier/cd-gitroot'                       # gitのルートディレクトリに移動
-    # zplug 'dracula/zsh', as:theme
+zplug 'yous/vanilli.sh'                            # バニラなzsh
+zplug 'zsh-users/zsh-autosuggestions'              # 候補デフォルト表示
+zplug 'zsh-users/zsh-completions'                  # 補完強化
+zplug 'zsh-users/zsh-syntax-highlighting', defer:2 # zshシンタックスハイライト
+zplug 'mollifier/anyframe'                         # pecopecoharapeko
+zplug 'mollifier/cd-gitroot'                       # gitのルートディレクトリに移動
+zplug 'b4b4r07/enhancd', use:'init.sh'
+# zplug 'dracula/zsh', as:theme
 
-    # if ! zplug check --verbose; then
-    #     printf 'Install? [y/N]: '
-    #     if read -q; then
-    #         echo; zplug install
-    #     fi
-    # fi
-    zplug check || zplug install
-
-    # zplug load --verbose
-    zplug load
-fi
+zplug check || zplug install
+zplug load --verbose
 
 zstyle :compinstall filename '~/.zshrc'
 
@@ -33,6 +24,10 @@ fi
 
 # mac用に調整
 export PATH="$HOME/local/bin:$PATH"
+
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_DEFAULT_OPTS='--height 40% --reverse --border --prompt="P " --margin=1,3 --inline-info'
 
 # 色々
 export LSCOLORS=gxfxcxdxbxegedabagacag
@@ -50,7 +45,6 @@ elif [ -x /usr/bin/dircolors ]; then
     alias dir='dir --color=auto'
     alias grep='grep --color=auto'
 fi
-
 
 # Gitのブランチ名をプロンプトに表示させる
 zstyle ':vcs_info:*' enable git
