@@ -1,17 +1,19 @@
 # zplug
-source ~/.zplug/init.zsh
+if [ -d ~/.zplug ]; then
+    source ~/.zplug/init.zsh
 
-zplug 'yous/vanilli.sh'                            # バニラなzsh
-zplug 'zsh-users/zsh-autosuggestions'              # 候補デフォルト表示
-zplug 'zsh-users/zsh-completions'                  # 補完強化
-zplug 'zsh-users/zsh-syntax-highlighting', defer:2 # zshシンタックスハイライト
-zplug 'mollifier/anyframe'                         # pecopecoharapeko
-zplug 'mollifier/cd-gitroot'                       # gitのルートディレクトリに移動
-zplug 'b4b4r07/enhancd', use:'init.sh'
-# zplug 'dracula/zsh', as:theme
-
-zplug check || zplug install
-zplug load --verbose
+    zplug 'yous/vanilli.sh'                            # バニラなzsh
+    zplug 'zsh-users/zsh-autosuggestions'              # 候補デフォルト表示
+    zplug 'zsh-users/zsh-completions'                  # 補完強化
+    zplug 'zsh-users/zsh-syntax-highlighting', defer:2 # zshシンタックスハイライト
+    zplug 'mollifier/anyframe'                         # pecopecoharapeko
+    zplug 'mollifier/cd-gitroot'                       # gitのルートディレクトリに移動
+    zplug 'b4b4r07/enhancd', use:'init.sh'
+    # zplug 'dracula/zsh', as:theme
+    
+    zplug check || zplug install
+    zplug load --verbose    
+fi
 
 zstyle :compinstall filename '~/.zshrc'
 
@@ -22,7 +24,6 @@ if is-at-least 4.3.10; then
     add-zsh-hook chpwd chpwd_recent_dirs
 fi
 
-# mac用に調整
 export PATH="$HOME/local/bin:$PATH"
 
 # fzf
@@ -103,6 +104,8 @@ typeset -U path             # PATHをユニークにする
 bindkey -e                  # emacsキーバインド
 setopt no_beep              # beep音なし
 setopt prompt_subst         # プロンプト
+stty stop undef             # Ctrl-sによるコンソールロック無効
+setopt IGNOREEOF            # Ctrl-dによるログアウト無効
 
 # ヒストリー
 HISTFILE=~/.zhistory
@@ -150,11 +153,3 @@ zstyle ':completion:*' completer _complete _match _ignored
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z} m:{A-Z}={a-z}'
 # 候補一覧の色分けをLS_COLORSで表示する
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-
-# anyframeバインドキー
-bindkey '^xe' anyframe-widget-execute-history
-bindkey '^xp' anyframe-widget-put-history
-bindkey '^xi' anyframe-widget-insert-git-branch
-bindkey '^xc' anyframe-widget-checkout-git-branch
-bindkey '^xb' anyframe-widget-cdr
-bindkey '^xf' anyframe-widget-insert-filename
