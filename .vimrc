@@ -1,6 +1,6 @@
 "
 " My vimrc
-"   updated_at 2018/04/26
+"   updated_at 2018/06/12
 "
 " You will need to have vim >= 8.0
 "
@@ -24,13 +24,13 @@ filetype off
 filetype plugin indent off
 
 " 起動時だけ
+let s:vimdir = $HOME . '/.vim'
 if has('vim_starting')
     " viのcompatibleモードを無効(デフォルトで無効なので不要)
     " if &compatible
     "     set nocompatible
     " endif
 
-    let s:vimdir = $HOME . '/.vim'
     if !isdirectory(s:vimdir)
         call system('mkdir ' . s:vimdir)
     endif
@@ -38,12 +38,12 @@ endif
 
 " dein {{{
 let s:dein_enabled = 0
+let s:dein_dir = s:vimdir . '/dein'
 " 8以上のときだけプラギン適用
 if v:version >= 800
     let s:dein_enabled = 1
 
     if has('vim_starting')
-        let s:dein_dir       = s:vimdir . '/dein'
         let s:dein_github    = s:dein_dir . '/repos/github.com'
         let s:dein_repo_name = 'Shougo/dein.vim'
         let s:dein_repo_dir  = s:dein_github . '/' . s:dein_repo_name
@@ -212,6 +212,7 @@ if v:version >= 800
 
         " call dein#add('nathanaelkane/vim-indent-guides')
         " call dein#add('Yggdroot/indentLine')
+        " call dein#add('mattn/benchvimrc-vim')
         " }}}
 
         call dein#end()
@@ -298,12 +299,14 @@ if has('conceal')
     set conceallevel=0
     set concealcursor=
 endif
+set lazyredraw
+set ttyfast
 
-highlight Normal ctermbg    = none
-highlight Comment ctermfg   = 7
-highlight Pmenu ctermbg     = 4
-highlight PmenuSel ctermbg  = 1
-highlight PMenuSbar ctermbg = 4
+" highlight Normal ctermbg    = none
+" highlight Comment ctermfg   = 7
+" highlight Pmenu ctermbg     = 4
+" highlight PmenuSel ctermbg  = 1
+" highlight PMenuSbar ctermbg = 4
 
 " マウスで弄る
 if has('mouse')
@@ -577,6 +580,7 @@ if s:dein_enabled
     augroup END
 
     " watchdogs
+    let g:watchdogs_check_BufWritePost_enable = 1
     call watchdogs#setup(g:quickrun_config)
 
     let php_sql_query = 1
@@ -601,6 +605,12 @@ if s:dein_enabled
     " for JSX
     let g:jsx_ext_required = 0
     " }}}
+
+    let g:vimfiler_as_default_explorer = 1
+    call vimfiler#custom#profile('default', 'context', {
+    \        'safe' : 0,
+    \        'edit_action' : 'tabopen',
+    \    })
 
     " Unite {{{
     let g:unite_enable_start_insert = 1
